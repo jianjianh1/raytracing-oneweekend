@@ -34,7 +34,7 @@ public class ProgressBar {
      *
      * @param increment the amount of progress
      */
-    public void progress(double increment) {
+    public void step(double increment) {
         progress += increment;
         if (progress > maxProgress) {
             return;
@@ -50,8 +50,12 @@ public class ProgressBar {
     /**
      * Adds progress by one
      */
-    public void progress() {
-        progress(1);
+    public void step() {
+        step(1);
+    }
+
+    public void show() {
+        System.out.print(toString() + '\r');
     }
 
     /**
@@ -59,6 +63,6 @@ public class ProgressBar {
      */
     @Override
     public String toString() {
-        return "Progress: [" + head.toString() + tail.toString() + ']' + '\r';
+        return "Progress: [" + head.toString() + tail.toString() + ']';
     }
 }

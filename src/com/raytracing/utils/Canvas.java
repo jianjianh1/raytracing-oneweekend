@@ -8,9 +8,9 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * Represents a image in raytracing programs
+ * Represents a canvas in raytracing programs
  */
-public class Image implements Closeable {
+public class Canvas implements Closeable {
     BufferedImage data;
     Graphics2D graphics;
 
@@ -20,7 +20,7 @@ public class Image implements Closeable {
      * @param width  the width of the image
      * @param height the height of the image
      */
-    public Image(int width, int height) {
+    public Canvas(int width, int height) {
         data = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         graphics = data.createGraphics();
     }
