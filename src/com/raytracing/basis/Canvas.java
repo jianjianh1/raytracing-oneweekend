@@ -1,4 +1,4 @@
-package com.raytracing.utils;
+package com.raytracing.basis;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -39,11 +39,13 @@ public class Canvas implements Closeable {
 
     /**
      * Save the image to a PNG file
+     *
      * @param fileName name of a PNG file
      * @throws IOException if it cannot write the file
      */
     public void save(String fileName) throws IOException {
-        ImageIO.write(data, "PNG", new File(fileName));
+        String[] tokens = fileName.split("\\.");
+        ImageIO.write(data, tokens[tokens.length - 1], new File(fileName));
     }
 
     @Override

@@ -1,7 +1,7 @@
 package com.raytracing.oneweekend;
 
 import com.raytracing.utils.ProgressBar;
-import com.raytracing.utils.Canvas;
+import com.raytracing.basis.Canvas;
 
 import java.awt.*;
 import java.io.IOException;
