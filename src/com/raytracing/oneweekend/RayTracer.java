@@ -8,7 +8,7 @@ import com.raytracing.basis.Canvas;
 import java.awt.*;
 import java.io.IOException;
 
-public class Main {
+public class RayTracer {
     private static final double ASPECT_RATIO = 16.0 / 9.0;
     // Image
     private static final int IMAGE_HEIGHT = 1080;
@@ -32,6 +32,8 @@ public class Main {
                 for (int y = 0; y < IMAGE_HEIGHT; y++) {
                     double u = (double) x / (IMAGE_WIDTH - 1);
                     double v = (double) y / (IMAGE_HEIGHT - 1);
+
+                    // ray start from origin and hit at u portion of width and v portion of height
                     Ray ray = new Ray(ORIGIN,
                             LOWER_LEFT_CORNER.add(HORIZONTAL.scale(u)).add(VERTICAL.scale(v)).subtract(ORIGIN));
 
@@ -47,7 +49,9 @@ public class Main {
 
     private static Color rayColor(Ray ray) {
         Vector3d unitDirection = ray.direction().normalize();
-        float t = (float) (0.5 * (unitDirection.y() + 1.0));
+        float t = (float) (0.5 * (unitDirection.y() + 1.0)); // [-1.0, 1.0]
+
+        // blend white (1.0F, 1.0F, 1.0F) and blue (0.5F, 0.7F, 1.0F)
         return new Color(
                 1F - t + 0.5F * t,
                 1F - t + 0.7F * t,
