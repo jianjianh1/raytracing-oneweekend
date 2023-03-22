@@ -104,4 +104,13 @@ public record Vector3d(double x, double y, double z) {
     public double angle(Vector3d other) {
         return Math.cos(dot(other) / (length() * other.length()));
     }
+
+    /**
+     * Returns the unit vector with the same direction
+     *
+     * @return the unit vector with the same direction
+     */
+    public Vector3d normalize() {
+        return scale(1 / length());
+    }
 }
