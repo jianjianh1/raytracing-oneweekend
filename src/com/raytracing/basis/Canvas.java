@@ -26,7 +26,9 @@ public class Canvas implements Closeable {
     }
 
     /**
-     * Fill pixel (x, y) with the given color
+     * Fill pixel (x, y) with the given color.
+     * Positive x direction is from left to right
+     * Positive y direction is from bottom to top
      *
      * @param x     the x-coordinate of the pixel
      * @param y     the y-coordinate of the pixel
@@ -34,7 +36,7 @@ public class Canvas implements Closeable {
      */
     public void fillPixel(int x, int y, Color color) {
         graphics.setColor(color);
-        graphics.fillRect(x, y, 1, 1);
+        graphics.fillRect(x, data.getHeight() - 1 - y, 1, 1);
     }
 
     /**
