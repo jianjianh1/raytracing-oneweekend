@@ -18,4 +18,24 @@ public record Ray(Vector3d origin, Vector3d direction) {
     public Vector3d at(double t) {
         return origin.add(direction.scale(t));
     }
+
+    /**
+     * Returns the normalized direction
+     *
+     * @return the normalized direction
+     */
+    public Vector3d unitDirection() {
+        return direction.normalize();
+    }
+
+    /**
+     * Returns a ray between the starting point and the end point
+     *
+     * @param start the start point
+     * @param end   the end point
+     * @return the ray between the start and the end
+     */
+    public static Ray between(Vector3d start, Vector3d end) {
+        return new Ray(start, end.subtract(start));
+    }
 }

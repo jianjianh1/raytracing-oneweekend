@@ -96,16 +96,6 @@ public record Vector3d(double x, double y, double z) {
     }
 
     /**
-     * Returns the angle in radian between this vector and another vector
-     *
-     * @param other another vector
-     * @return the angle in radian [0, PI]
-     */
-    public double angle(Vector3d other) {
-        return Math.cos(dot(other) / (length() * other.length()));
-    }
-
-    /**
      * Returns the unit vector with the same direction
      *
      * @return the unit vector with the same direction

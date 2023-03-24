@@ -2,6 +2,7 @@ package com.raytracing.oneweekend;
 
 import com.raytracing.basis.Vector3d;
 import com.raytracing.objects.Ray;
+import com.raytracing.objects.Sphere;
 import com.raytracing.utils.ProgressBar;
 import com.raytracing.basis.Canvas;
 
@@ -24,6 +25,9 @@ public class RayTracer {
     private static final Vector3d LOWER_LEFT_CORNER =
             ORIGIN.subtract(HORIZONTAL.scale(0.5)).subtract(VERTICAL.scale(0.5)).subtract(new Vector3d(0, 0, FOCAL_LENGTH));
 
+    // Sphere
+    private static final Sphere SPHERE = new Sphere(new Vector3d(0, 0, -2), 0.5);
+
     public static void main(String[] args) throws IOException {
         ProgressBar progressBar = new ProgressBar(IMAGE_WIDTH * IMAGE_HEIGHT);
 
@@ -34,8 +38,7 @@ public class RayTracer {
                     double v = (double) y / (IMAGE_HEIGHT - 1);
 
                     // ray start from origin and hit at u portion of width and v portion of height
-                    Ray ray = new Ray(ORIGIN,
-                            LOWER_LEFT_CORNER.add(HORIZONTAL.scale(u)).add(VERTICAL.scale(v)).subtract(ORIGIN));
+                    Ray ray = Ray.between(ORIGIN, LOWER_LEFT_CORNER.add(HORIZONTAL.scale(u)).add(VERTICAL.scale(v)));
 
                     canvas.fillPixel(x, y, rayColor(ray));
 
@@ -43,12 +46,15 @@ public class RayTracer {
                     progressBar.show();
                 }
             }
-            canvas.save("gradient.png");
+            canvas.save("sphere.png");
         }
     }
 
     private static Color rayColor(Ray ray) {
-        Vector3d unitDirection = ray.direction().normalize();
+        if (SPHERE.hitBy(ray)) {
+            return Color.RED;
+        }
+        Vector3d unitDirection = ray.unitDirection();
         float t = (float) (0.5 * (unitDirection.y() + 1.0)); // [-1.0, 1.0]
 
         // blend white (1.0F, 1.0F, 1.0F) and blue (0.5F, 0.7F, 1.0F)

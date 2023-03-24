@@ -10,7 +10,7 @@ public class ProgressBar {
     private final double maxProgress;
     private double progress;
     private int displayLength;
-    private boolean displayUpdated;
+    private boolean displayNeedUpdate;
     private final StringBuilder head;
     private final StringBuilder tail;
 
@@ -42,7 +42,7 @@ public class ProgressBar {
         }
         int displayIncrement = (int) (progress / maxProgress * MAX_DISPLAY_LENGTH) - displayLength;
         if (displayIncrement > 0) {
-            displayUpdated = true;
+            displayNeedUpdate = true;
         }
         for (int i = 0; i < displayIncrement; i++) {
             head.append(PROGRESS_CHAR);
@@ -58,11 +58,14 @@ public class ProgressBar {
         step(1);
     }
 
+    /**
+     * Shows the displayed progress bar when needed
+     */
     public void show() {
-        if (displayUpdated) {
+        if (displayNeedUpdate) {
             System.out.print(toString() + '\r');
         }
-        displayUpdated = false;
+        displayNeedUpdate = false;
     }
 
     /**

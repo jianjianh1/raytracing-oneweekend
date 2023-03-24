@@ -40,9 +40,9 @@ public class Canvas implements Closeable {
     }
 
     /**
-     * Save the image to a PNG file
+     * Save the image to an image file
      *
-     * @param fileName name of a PNG file
+     * @param fileName name of an image file
      * @throws IOException if it cannot write the file
      */
     public void save(String fileName) throws IOException {
@@ -50,6 +50,9 @@ public class Canvas implements Closeable {
         ImageIO.write(data, tokens[tokens.length - 1], new File(fileName));
     }
 
+    /**
+     * Implements Closeable
+     */
     @Override
     public void close() {
         graphics.dispose();
