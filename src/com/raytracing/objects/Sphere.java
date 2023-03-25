@@ -13,14 +13,30 @@ public record Sphere(Vector3d center, double radius) {
      * Detects if this sphere is hit by the given ray
      *
      * @param ray a ray
-     * @return true if the ray hits this sphere
+     * @return the parameter representing the position the ray hit the sphere if it hits else -1
      */
-    public boolean hitBy(Ray ray) {
+    public double hitBy(Ray ray) {
         // require us to solve (origin + t * direction - center) * (origin + t * direction - center) = r * r
         // we can write it as at^2 + bt + c = 0
+        Vector3d originToCenter = ray.origin().subtract(center);
         double a = ray.direction().lengthSquared();
-        double b = 2 * ray.direction().dot(ray.origin().subtract(center));
-        double c = ray.origin().subtract(center).lengthSquared() - radius * radius;
-        return b * b - 4 * a * c > 0;
+        double halfB = ray.direction().dot(originToCenter); // negative
+        double c = originToCenter.lengthSquared() - radius * radius;
+        double quarterDiscriminant = halfB * halfB - a * c;
+        if (quarterDiscriminant < 0) {
+            return -1;
+        } else {
+            return (-halfB - Math.sqrt(quarterDiscriminant)) / a; // first intersection
+        }
+    }
+
+    /**
+     * Returns the surface normal vector from a given point
+     *
+     * @param point a point that should be on the surface of the sphere
+     * @return the surface normal vector
+     */
+    public Vector3d surfaceNormal(Vector3d point) {
+        return point.subtract(center).normalize();
     }
 }

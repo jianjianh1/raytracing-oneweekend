@@ -26,7 +26,7 @@ public class RayTracer {
             ORIGIN.subtract(HORIZONTAL.scale(0.5)).subtract(VERTICAL.scale(0.5)).subtract(new Vector3d(0, 0, FOCAL_LENGTH));
 
     // Sphere
-    private static final Sphere SPHERE = new Sphere(new Vector3d(0, 0, -2), 0.5);
+    private static final Sphere SPHERE = new Sphere(new Vector3d(0, 0, -1), 0.5);
 
     public static void main(String[] args) throws IOException {
         ProgressBar progressBar = new ProgressBar(IMAGE_WIDTH * IMAGE_HEIGHT);
@@ -46,22 +46,29 @@ public class RayTracer {
                     progressBar.show();
                 }
             }
-            canvas.save("sphere.png");
+            canvas.save("sphere_surface.png");
         }
     }
 
     private static Color rayColor(Ray ray) {
-        if (SPHERE.hitBy(ray)) {
-            return Color.RED;
+        double t = SPHERE.hitBy(ray);
+        if (t > 0) {
+            Vector3d intersection = ray.at(t);
+            Vector3d surfaceNormal = SPHERE.surfaceNormal(intersection);
+            return new Color(
+                    (float) (0.5 * (surfaceNormal.x() + 1)),
+                    (float) (0.5 * (surfaceNormal.y() + 1)),
+                    (float) (0.5 * (surfaceNormal.z() + 1))
+            );
         }
         Vector3d unitDirection = ray.unitDirection();
-        float t = (float) (0.5 * (unitDirection.y() + 1.0)); // [-1.0, 1.0]
+        float s = (float) (0.5 * (unitDirection.y() + 1.0)); // [-1.0, 1.0]
 
         // blend white (1.0F, 1.0F, 1.0F) and blue (0.5F, 0.7F, 1.0F)
         return new Color(
-                1F - t + 0.5F * t,
-                1F - t + 0.7F * t,
-                1F - t + t
+                1F - s + 0.5F * s,
+                1F - s + 0.7F * s,
+                1F - s + s
         );
     }
 }
