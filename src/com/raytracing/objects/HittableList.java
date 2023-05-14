@@ -20,16 +20,6 @@ public class HittableList implements Hittable, Iterable<Hittable> {
     }
 
     /**
-     * Constructs a list with one {@code Hittable}.
-     *
-     * @param hittable the {@code Hittable} in the list
-     */
-    public HittableList(Hittable hittable) {
-        this();
-        add(hittable);
-    }
-
-    /**
      * Adds a {@code Hittable} to the list
      *
      * @param hittable a {@code Hittable}
