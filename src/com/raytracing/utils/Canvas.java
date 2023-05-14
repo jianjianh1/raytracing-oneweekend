@@ -1,4 +1,4 @@
-package com.raytracing.basis;
+package com.raytracing.utils;
 
 import javax.imageio.ImageIO;
 import java.awt.*;

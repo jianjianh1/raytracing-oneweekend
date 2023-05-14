@@ -1,10 +1,12 @@
 package com.raytracing.oneweekend;
 
 import com.raytracing.basis.Vector3d;
+import com.raytracing.interfaces.Hittable;
+import com.raytracing.objects.HittableList;
 import com.raytracing.objects.Ray;
 import com.raytracing.objects.Sphere;
 import com.raytracing.utils.ProgressBar;
-import com.raytracing.basis.Canvas;
+import com.raytracing.utils.Canvas;
 
 import java.awt.*;
 import java.io.IOException;
@@ -25,10 +27,11 @@ public class RayTracer {
     private static final Vector3d LOWER_LEFT_CORNER =
             ORIGIN.subtract(HORIZONTAL.scale(0.5)).subtract(VERTICAL.scale(0.5)).subtract(new Vector3d(0, 0, FOCAL_LENGTH));
 
-    // Sphere
-    private static final Sphere SPHERE = new Sphere(new Vector3d(0, 0, -1), 0.5);
+    private static final HittableList world = new HittableList();
 
     public static void main(String[] args) throws IOException {
+        initializeWorld();
+
         ProgressBar progressBar = new ProgressBar(IMAGE_WIDTH * IMAGE_HEIGHT);
 
         try (Canvas canvas = new Canvas(IMAGE_WIDTH, IMAGE_HEIGHT)) {
@@ -46,21 +49,22 @@ public class RayTracer {
                     progressBar.show();
                 }
             }
-            canvas.save("sphere_surface.png");
+            canvas.save("sphere_ground.png");
         }
     }
 
     private static Color rayColor(Ray ray) {
-        double t = SPHERE.hitBy(ray);
-        if (t > 0) {
-            Vector3d intersection = ray.at(t);
-            Vector3d surfaceNormal = SPHERE.surfaceNormal(intersection);
+        Hittable.HitRecord record = ((Hittable) RayTracer.world).hit(ray, 0, Double.MAX_VALUE);
+        if (record != null) {
+            Vector3d surfaceNormal = record.normal();
             return new Color(
                     (float) (0.5 * (surfaceNormal.x() + 1)),
                     (float) (0.5 * (surfaceNormal.y() + 1)),
                     (float) (0.5 * (surfaceNormal.z() + 1))
             );
         }
+
+        // no hit
         Vector3d unitDirection = ray.unitDirection();
         float s = (float) (0.5 * (unitDirection.y() + 1.0)); // [-1.0, 1.0]
 
@@ -70,5 +74,10 @@ public class RayTracer {
                 1F - s + 0.7F * s,
                 1F - s + s
         );
+    }
+
+    private static void initializeWorld() {
+        world.add(new Sphere(new Vector3d(0, 0, -1), 0.5));
+        world.add(new Sphere(new Vector3d(0, -100.5, -1), 100));
     }
 }

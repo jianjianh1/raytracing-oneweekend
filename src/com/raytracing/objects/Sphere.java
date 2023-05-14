@@ -1,6 +1,7 @@
 package com.raytracing.objects;
 
 import com.raytracing.basis.Vector3d;
+import com.raytracing.interfaces.Hittable;
 
 /**
  * Represents a sphere that can be hit by a ray
@@ -8,14 +9,27 @@ import com.raytracing.basis.Vector3d;
  * @param center the center of the sphere
  * @param radius the radius of the sphere
  */
-public record Sphere(Vector3d center, double radius) {
+public record Sphere(Vector3d center, double radius) implements Hittable {
     /**
-     * Detects if this sphere is hit by the given ray
+     * Returns the surface normal vector from a given point
      *
-     * @param ray a ray
-     * @return the parameter representing the position the ray hit the sphere if it hits else -1
+     * @param point a point that should be on the surface of the sphere
+     * @return the surface normal vector
      */
-    public double hitBy(Ray ray) {
+    public Vector3d normalAt(Vector3d point) {
+        return point.subtract(center).normalize();
+    }
+
+    /**
+     * Returns a {@code HitRecord} if the ray hit the sphere
+     *
+     * @param ray  the ray
+     * @param tMin the minimum scale of direction
+     * @param tMax the maximum scale of direction
+     * @return the {@code HitRecord} if hit else null
+     */
+    @Override
+    public HitRecord hit(Ray ray, double tMin, double tMax) {
         // require us to solve (origin + t * direction - center) * (origin + t * direction - center) = r * r
         // we can write it as at^2 + bt + c = 0
         Vector3d originToCenter = ray.origin().subtract(center);
@@ -23,20 +37,17 @@ public record Sphere(Vector3d center, double radius) {
         double halfB = ray.direction().dot(originToCenter); // negative
         double c = originToCenter.lengthSquared() - radius * radius;
         double quarterDiscriminant = halfB * halfB - a * c;
-        if (quarterDiscriminant < 0) {
-            return -1;
-        } else {
-            return (-halfB - Math.sqrt(quarterDiscriminant)) / a; // first intersection
-        }
-    }
 
-    /**
-     * Returns the surface normal vector from a given point
-     *
-     * @param point a point that should be on the surface of the sphere
-     * @return the surface normal vector
-     */
-    public Vector3d surfaceNormal(Vector3d point) {
-        return point.subtract(center).normalize();
+        double t;
+        if (quarterDiscriminant < 0) {
+            return null;
+        } else {
+            t = (-halfB - Math.sqrt(quarterDiscriminant)) / a; // first intersection
+        }
+        if (tMin <= t && t <= tMax) {
+            return new HitRecord(ray, t, normalAt(ray.at(t)));
+        } else {
+            return null;
+        }
     }
 }
