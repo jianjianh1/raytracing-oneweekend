@@ -16,7 +16,10 @@ public class RayTracer {
     private static final int IMAGE_WIDTH = 1920;
     private static final int IMAGE_HEIGHT = 1080;
 
+    private static final double INFINITY = Double.MAX_VALUE;
+    private static final double HIT_THRESHOLD = 1E-3;
     private static final int SAMPLES_PER_PIXEL = 100;
+    private static final int MAX_DEPTH = 50;
 
     private static final Camera camera = new Camera();
     private static final HittableList world = new HittableList();
@@ -35,7 +38,7 @@ public class RayTracer {
                         double v = (y + Math.random()) / (IMAGE_HEIGHT - 1);
                         // ray start from origin and hit at u portion of width and v portion of height
                         Ray ray = camera.getRay(u, v);
-                        pixel.addSample(rayColor(ray));
+                        pixel.addSample(rayColor(ray, MAX_DEPTH));
                     }
                     canvas.fillPixel(x, y, pixel.color());
 
@@ -43,24 +46,29 @@ public class RayTracer {
                     progressBar.show();
                 }
             }
-            canvas.save("antialias.png");
+            canvas.save("reflection.png");
         }
     }
 
-    private static PixelColor rayColor(Ray ray) {
-        Hittable.HitRecord record = world.hit(ray, 0, Double.MAX_VALUE);
+    private static PixelColor rayColor(Ray ray, int depth) {
+        if (depth <= 0) {
+            return PixelColor.BLACK;
+        }
+
+        Hittable.HitRecord record = world.hit(ray, HIT_THRESHOLD, INFINITY);
         if (record != null) {
             Vector3d surfaceNormal = record.normal();
-            return new PixelColor(surfaceNormal.add(new Vector3d(1, 1, 1)).scale(0.5));
+            Vector3d reflection = surfaceNormal.add(Vector3d.randomUnit());
+            // brightness is halved by each reflection
+            return rayColor(new Ray(record.point(), reflection), depth - 1).scale(0.5);
         }
 
         // no hit
         Vector3d unitDirection = ray.unitDirection();
         float s = (float) (0.5 * (unitDirection.y() + 1.0)); // [-1.0, 1.0]
 
-        // blend white (1.0F, 1.0F, 1.0F) and blue (0.5F, 0.7F, 1.0F)
-        PixelColor blue = new PixelColor(0.5, 0.7, 1.0);
-        return PixelColor.WHITE.scale(1 - s).add(blue.scale(s));
+        // blend white (1.0F, 1.0F, 1.0F) and sky blue (0.5F, 0.7F, 1.0F)
+        return PixelColor.WHITE.scale(1 - s).add(PixelColor.SKY_BLUE.scale(s));
     }
 
     private static void initializeWorld() {

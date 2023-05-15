@@ -1,5 +1,7 @@
 package com.raytracing.basis;
 
+import java.util.Random;
+
 /**
  * 3-dimensional vector
  *
@@ -102,5 +104,19 @@ public record Vector3d(double x, double y, double z) {
      */
     public Vector3d normalize() {
         return scale(1 / length());
+    }
+
+    /**
+     * Returns a random unit vector.
+     *
+     * @return a random unit vector
+     */
+    public static Vector3d randomUnit() {
+        double phi = Math.random() * 2 * Math.PI;
+        double theta = Math.random() * Math.PI;
+        double x = Math.sin(theta) * Math.cos(phi);
+        double y = Math.sin(theta) * Math.sin(phi);
+        double z = Math.cos(theta);
+        return new Vector3d(x, y, z);
     }
 }

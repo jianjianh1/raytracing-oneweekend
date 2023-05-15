@@ -7,6 +7,8 @@ import java.awt.*;
  */
 public class PixelColor {
     public static final PixelColor WHITE = new PixelColor(1, 1, 1);
+    public static final PixelColor BLACK = new PixelColor(0, 0, 0);
+    public static final PixelColor SKY_BLUE = new PixelColor(0.5, 0.7, 1.0);
 
     private static final double MIN = 0;
     private static final double MAX = 1;
@@ -97,12 +99,16 @@ public class PixelColor {
     }
 
     /**
-     * Returns the color of the pixel.
+     * Returns the color of the pixel with gamma-correction for gamma=2.0.
      *
      * @return the color
      */
     public Color color() {
-        return new Color((float) clamp(red()), (float) clamp(green()), (float) clamp(blue()));
+        return new Color(
+                (float) clamp(Math.sqrt(red())),
+                (float) clamp(Math.sqrt(green())),
+                (float) clamp(Math.sqrt(blue()))
+        );
     }
 
     /**
