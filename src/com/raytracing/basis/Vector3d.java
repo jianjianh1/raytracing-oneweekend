@@ -1,7 +1,5 @@
 package com.raytracing.basis;
 
-import java.util.Random;
-
 /**
  * 3-dimensional vector
  *
