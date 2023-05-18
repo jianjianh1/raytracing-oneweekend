@@ -1,12 +1,10 @@
 package com.raytracing.oneweekend;
 
-import com.raytracing.basis.PixelColor;
-import com.raytracing.basis.Vector3d;
+import com.raytracing.base.PixelColor;
+import com.raytracing.base.Vector3d;
 import com.raytracing.interfaces.Hittable;
-import com.raytracing.objects.Camera;
-import com.raytracing.objects.HittableList;
-import com.raytracing.objects.Ray;
-import com.raytracing.objects.Sphere;
+import com.raytracing.interfaces.Material;
+import com.raytracing.objects.*;
 import com.raytracing.utils.ProgressBar;
 import com.raytracing.utils.Canvas;
 
@@ -46,7 +44,7 @@ public class RayTracer {
                     progressBar.show();
                 }
             }
-            canvas.save("reflection.png");
+            canvas.save("lambertian.png");
         }
     }
 
@@ -55,12 +53,13 @@ public class RayTracer {
             return PixelColor.BLACK;
         }
 
-        Hittable.HitRecord record = world.hit(ray, HIT_THRESHOLD, INFINITY);
-        if (record != null) {
-            Vector3d surfaceNormal = record.normal();
-            Vector3d reflection = surfaceNormal.add(Vector3d.randomUnit());
-            // brightness is halved by each reflection
-            return rayColor(new Ray(record.point(), reflection), depth - 1).scale(0.5);
+        Hittable.HitRecord hit = world.hit(ray, HIT_THRESHOLD, INFINITY);
+        if (hit != null) {
+            Material.ScatterRecord scatter = hit.material().scatter(hit);
+            if (scatter == null) {
+                return PixelColor.BLACK;
+            }
+            return rayColor(scatter.scatteredRay(), depth - 1).dot(scatter.attenuation());
         }
 
         // no hit
@@ -72,7 +71,7 @@ public class RayTracer {
     }
 
     private static void initializeWorld() {
-        world.add(new Sphere(new Vector3d(0, 0, -1), 0.5));
-        world.add(new Sphere(new Vector3d(0, -100.5, -1), 100));
+        world.add(new Sphere(new Vector3d(0, 0, -1), 0.5, new Lambertian(0.5)));
+        world.add(new Sphere(new Vector3d(0, -100.5, -1), 100, new Lambertian(0.5)));
     }
 }

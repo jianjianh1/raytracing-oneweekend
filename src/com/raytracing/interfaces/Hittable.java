@@ -1,6 +1,6 @@
 package com.raytracing.interfaces;
 
-import com.raytracing.basis.Vector3d;
+import com.raytracing.base.Vector3d;
 import com.raytracing.objects.Ray;
 
 /**
@@ -14,17 +14,19 @@ public interface Hittable {
      * @param t         the scale of direction
      * @param normal    the surface normal at the hit point
      * @param frontFace true if the ray hit at the front face
+     * @param material  the material of the surface
      */
-    record HitRecord(Ray ray, double t, Vector3d normal, boolean frontFace) {
+    record HitRecord(Ray ray, double t, Vector3d normal, boolean frontFace, Material material) {
         /**
          * Records that the ray hit the surface with the given normal at t.
          *
-         * @param ray    the ray
-         * @param t      the scale of direction
-         * @param normal the normal of the surface
+         * @param ray      the ray
+         * @param t        the scale of direction
+         * @param normal   the normal of the surface
+         * @param material the material of the surface
          */
-        public HitRecord(Ray ray, double t, Vector3d normal) {
-            this(ray, t, normal, frontFace(ray, normal));
+        public HitRecord(Ray ray, double t, Vector3d normal, Material material) {
+            this(ray, t, normal, frontFace(ray, normal), material);
         }
 
         /**

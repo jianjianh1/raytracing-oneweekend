@@ -1,4 +1,4 @@
-package com.raytracing.basis;
+package com.raytracing.base;
 
 /**
  * 3-dimensional vector
@@ -116,5 +116,26 @@ public record Vector3d(double x, double y, double z) {
         double y = Math.sin(theta) * Math.sin(phi);
         double z = Math.cos(theta);
         return new Vector3d(x, y, z);
+    }
+
+    /**
+     * Returns true if this vector is near zero.
+     *
+     * @return true if this vector is near zero else false
+     */
+    public boolean nearZero() {
+        final double epsilon = 1e-8;
+        return x < epsilon && y < epsilon && z < epsilon;
+    }
+
+    /**
+     * Returns the reflected vector on the surface with the given normal
+     * @param surfaceNormal the normal of the surface
+     * @return the reflected vector
+     */
+    public Vector3d reflectOn(Vector3d surfaceNormal) {
+        surfaceNormal = surfaceNormal.normalize();
+        // v - 2(v dot n) * n
+        return this.subtract(surfaceNormal.scale(2 * this.dot(surfaceNormal)));
     }
 }

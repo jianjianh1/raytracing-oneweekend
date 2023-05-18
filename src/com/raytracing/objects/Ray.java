@@ -1,6 +1,6 @@
 package com.raytracing.objects;
 
-import com.raytracing.basis.Vector3d;
+import com.raytracing.base.Vector3d;
 
 /**
  * Represents rays in 3D scenes

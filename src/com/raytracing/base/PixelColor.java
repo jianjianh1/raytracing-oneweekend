@@ -1,4 +1,4 @@
-package com.raytracing.basis;
+package com.raytracing.base;
 
 import java.awt.*;
 
@@ -119,6 +119,16 @@ public class PixelColor {
      */
     public PixelColor add(PixelColor other) {
         return new PixelColor(red() + other.red(), green() + other.green(), blue() + other.blue());
+    }
+
+    /**
+     * Returns the dot-product of two colors.
+     *
+     * @param other another color
+     * @return a pixel with color of the dot-product
+     */
+    public PixelColor dot(PixelColor other) {
+        return new PixelColor(red() * other.red(), green() * other.green(), blue() * other.blue());
     }
 
     /**

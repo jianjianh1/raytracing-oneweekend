@@ -1,7 +1,8 @@
 package com.raytracing.objects;
 
-import com.raytracing.basis.Vector3d;
+import com.raytracing.base.Vector3d;
 import com.raytracing.interfaces.Hittable;
+import com.raytracing.interfaces.Material;
 
 /**
  * Represents a sphere that can be hit by a ray
@@ -9,7 +10,7 @@ import com.raytracing.interfaces.Hittable;
  * @param center the center of the sphere
  * @param radius the radius of the sphere
  */
-public record Sphere(Vector3d center, double radius) implements Hittable {
+public record Sphere(Vector3d center, double radius, Material material) implements Hittable {
     /**
      * Returns the surface normal vector from a given point
      *
@@ -45,7 +46,7 @@ public record Sphere(Vector3d center, double radius) implements Hittable {
             t = (-halfB - Math.sqrt(quarterDiscriminant)) / a; // first intersection
         }
         if (tMin <= t && t <= tMax) {
-            return new HitRecord(ray, t, normalAt(ray.at(t)));
+            return new HitRecord(ray, t, normalAt(ray.at(t)), material);
         } else {
             return null;
         }
