@@ -44,7 +44,7 @@ public class RayTracer {
                     progressBar.show();
                 }
             }
-            canvas.save("lambertian.png");
+            canvas.save("fuzzy_metal.png");
         }
     }
 
@@ -71,7 +71,13 @@ public class RayTracer {
     }
 
     private static void initializeWorld() {
-        world.add(new Sphere(new Vector3d(0, 0, -1), 0.5, new Lambertian(0.5)));
-        world.add(new Sphere(new Vector3d(0, -100.5, -1), 100, new Lambertian(0.5)));
+        final Material groundMaterial = new Lambertian(new PixelColor(0.8, 0.8, 0));
+        final Material centerMaterial = new Lambertian(new PixelColor(0.7, 0.3, 0.3));
+        final Material leftMaterial = new Metal(new PixelColor(0.8, 0.8, 0.8), 0.3);
+        final Material rightMaterial = new Metal(new PixelColor(0.8, 0.6, 0.2), 1.0);
+        world.add(new Sphere(new Vector3d(0, 0, -1), 0.5, centerMaterial));
+        world.add(new Sphere(new Vector3d(0, -100.5, -1), 100, groundMaterial));
+        world.add(new Sphere(new Vector3d(-1, 0, -1), 0.5, leftMaterial));
+        world.add(new Sphere(new Vector3d(1, 0, -1), 0.5, rightMaterial));
     }
 }
