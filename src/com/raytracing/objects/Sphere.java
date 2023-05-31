@@ -18,7 +18,7 @@ public record Sphere(Vector3d center, double radius, Material material) implemen
      * @return the surface normal vector
      */
     public Vector3d normalAt(Vector3d point) {
-        return point.subtract(center).normalize();
+        return point.subtract(center).scale(1 / radius);
     }
 
     /**
@@ -44,6 +44,11 @@ public record Sphere(Vector3d center, double radius, Material material) implemen
             return null;
         } else {
             t = (-halfB - Math.sqrt(quarterDiscriminant)) / a; // first intersection
+        }
+        if (tMin <= t && t <= tMax) {
+            return new HitRecord(ray, t, normalAt(ray.at(t)), material);
+        } else {
+            t = (-halfB + Math.sqrt(quarterDiscriminant)) / a; // second intersection
         }
         if (tMin <= t && t <= tMax) {
             return new HitRecord(ray, t, normalAt(ray.at(t)), material);
