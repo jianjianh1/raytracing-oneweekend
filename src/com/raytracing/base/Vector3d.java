@@ -9,13 +9,6 @@ package com.raytracing.base;
  */
 public record Vector3d(double x, double y, double z) {
     /**
-     * Constructs a vector with zeros in all dimensions
-     */
-    public Vector3d() {
-        this(0, 0, 0);
-    }
-
-    /**
      * Returns the length of the vector
      *
      * @return the length of the vector
@@ -119,23 +112,26 @@ public record Vector3d(double x, double y, double z) {
     }
 
     /**
-     * Returns true if this vector is near zero.
-     *
-     * @return true if this vector is near zero else false
-     */
-    public boolean nearZero() {
-        final double epsilon = 1e-8;
-        return x < epsilon && y < epsilon && z < epsilon;
-    }
-
-    /**
      * Returns the reflected vector on the surface with the given normal
+     *
      * @param surfaceNormal the normal of the surface
      * @return the reflected vector
      */
     public Vector3d reflectOn(Vector3d surfaceNormal) {
-        surfaceNormal = surfaceNormal.normalize();
-        // v - 2(v dot n) * n
         return this.subtract(surfaceNormal.scale(2 * this.dot(surfaceNormal)));
+    }
+
+    /**
+     * Returns the refracted vector that's produced by this vector refracts on the surface with given normal.
+     *
+     * @param normal          the surface normal
+     * @param refractionRatio the ratio of refraction
+     * @return the refracted vector
+     */
+    public Vector3d refractOn(Vector3d normal, double refractionRatio) {
+        double cosTheta = this.dot(normal.opposite());
+        Vector3d outPerpendicular = this.add(normal.scale(cosTheta)).scale(refractionRatio);
+        Vector3d outParallel = normal.scale(-Math.sqrt(1 - outPerpendicular.lengthSquared()));
+        return outPerpendicular.add(outParallel);
     }
 }

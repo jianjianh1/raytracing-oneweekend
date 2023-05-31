@@ -11,8 +11,9 @@ import com.raytracing.utils.Canvas;
 import java.io.IOException;
 
 public class RayTracer {
-    private static final int IMAGE_WIDTH = 1920;
-    private static final int IMAGE_HEIGHT = 1080;
+    private static final double ASPECT_RATIO = 16.0 / 9.0;
+    private static final int IMAGE_WIDTH = 1080;
+    private static final int IMAGE_HEIGHT = (int) (IMAGE_WIDTH / ASPECT_RATIO) ;
 
     private static final double INFINITY = Double.MAX_VALUE;
     private static final double HIT_THRESHOLD = 1E-3;
@@ -44,7 +45,7 @@ public class RayTracer {
                     progressBar.show();
                 }
             }
-            canvas.save("fuzzy_metal.png");
+            canvas.save("dielectric.png");
         }
     }
 
@@ -72,11 +73,11 @@ public class RayTracer {
 
     private static void initializeWorld() {
         final Material groundMaterial = new Lambertian(new PixelColor(0.8, 0.8, 0));
-        final Material centerMaterial = new Lambertian(new PixelColor(0.7, 0.3, 0.3));
-        final Material leftMaterial = new Metal(new PixelColor(0.8, 0.8, 0.8), 0.3);
-        final Material rightMaterial = new Metal(new PixelColor(0.8, 0.6, 0.2), 1.0);
-        world.add(new Sphere(new Vector3d(0, 0, -1), 0.5, centerMaterial));
+        final Material centerMaterial = new Lambertian(new PixelColor(0.1, 0.2, 0.5));
+        final Material leftMaterial = new Dielectric(1.5);
+        final Material rightMaterial = new Metal(new PixelColor(0.8, 0.6, 0.2), 0);
         world.add(new Sphere(new Vector3d(0, -100.5, -1), 100, groundMaterial));
+        world.add(new Sphere(new Vector3d(0, 0, -1), 0.5, centerMaterial));
         world.add(new Sphere(new Vector3d(-1, 0, -1), 0.5, leftMaterial));
         world.add(new Sphere(new Vector3d(1, 0, -1), 0.5, rightMaterial));
     }
