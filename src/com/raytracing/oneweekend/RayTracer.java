@@ -20,7 +20,7 @@ public class RayTracer {
     private static final int SAMPLES_PER_PIXEL = 100;
     private static final int MAX_DEPTH = 50;
 
-    private static final Camera camera = new Camera();
+    private static final Camera camera = new Camera(90, ASPECT_RATIO);
     private static final HittableList world = new HittableList();
 
     public static void main(String[] args) throws IOException {
@@ -45,7 +45,7 @@ public class RayTracer {
                     progressBar.show();
                 }
             }
-            canvas.save("dielectric.png");
+            canvas.save("wide_angle.png");
         }
     }
 
@@ -72,13 +72,20 @@ public class RayTracer {
     }
 
     private static void initializeWorld() {
-        final Material groundMaterial = new Lambertian(new PixelColor(0.8, 0.8, 0));
-        final Material centerMaterial = new Lambertian(new PixelColor(0.1, 0.2, 0.5));
-        final Material leftMaterial = new Dielectric(1.5);
-        final Material rightMaterial = new Metal(new PixelColor(0.8, 0.6, 0.2), 0);
-        world.add(new Sphere(new Vector3d(0, -100.5, -1), 100, groundMaterial));
-        world.add(new Sphere(new Vector3d(0, 0, -1), 0.5, centerMaterial));
-        world.add(new Sphere(new Vector3d(-1, 0, -1), 0.5, leftMaterial));
-        world.add(new Sphere(new Vector3d(1, 0, -1), 0.5, rightMaterial));
+//        final Material groundMaterial = new Lambertian(new PixelColor(0.8, 0.8, 0));
+//        final Material centerMaterial = new Lambertian(new PixelColor(0.1, 0.2, 0.5));
+//        final Material leftMaterial = new Dielectric(1.5);
+//        final Material rightMaterial = new Metal(new PixelColor(0.8, 0.6, 0.2), 0);
+//        world.add(new Sphere(new Vector3d(0, -100.5, -1), 100, groundMaterial));
+//        world.add(new Sphere(new Vector3d(0, 0, -1), 0.5, centerMaterial));
+//        world.add(new Sphere(new Vector3d(-1, 0, -1), 0.5, leftMaterial));
+//        world.add(new Sphere(new Vector3d(-1, 0, -1), -0.4, leftMaterial));
+//        world.add(new Sphere(new Vector3d(1, 0, -1), 0.5, rightMaterial));
+
+        final double R = Math.cos(Math.PI / 4);
+        final Material leftMaterial = new Lambertian(new PixelColor(0, 0, 1));
+        final Material rightMaterial = new Lambertian(new PixelColor(1, 0, 0));
+        world.add(new Sphere(new Vector3d(-R, 0, -1), R, leftMaterial));
+        world.add(new Sphere(new Vector3d(R, 0, -1), R, rightMaterial));
     }
 }
