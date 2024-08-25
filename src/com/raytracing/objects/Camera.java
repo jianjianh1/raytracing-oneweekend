@@ -41,10 +41,13 @@ public class Camera {
      * @return the ray that shoots to (u, v)
      */
     public Ray getRay(double u, double v) {
-        double randomAngle = 2 * Math.PI * Math.random();
-        Vector3d randomDirection = horizontal.normalized().scale(Math.cos(randomAngle))
-                .add(vertical.normalized().scale(Math.sin(randomAngle)));
-        Vector3d offset = randomDirection.scale(lensRadius);
+        Vector3d offset = horizontal.normalized().scale(2.0 * Math.random() - 1.0)
+                .add(vertical.normalized().scale(2.0 * Math.random() - 1.0));
+        while (offset.length() > 1.0) {
+            offset = horizontal.normalized().scale(2.0 * Math.random() - 1.0)
+                    .add(vertical.normalized().scale(2.0 * Math.random() - 1.0));
+        }
+        offset = offset.scale(lensRadius);
 
         Vector3d point = bottomLeft.add(horizontal.scale(u)).add(vertical.scale(v));
         return Ray.between(origin.add(offset), point);
