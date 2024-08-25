@@ -23,9 +23,9 @@ public class Camera {
         double viewportHeight = 2.0 * (Math.tan(theta / 2) * focusDist);
         double viewportWidth = aspectRatio * viewportHeight;
 
-        Vector3d focus = lookFrom.subtract(lookAt).normalize().scale(focusDist);
-        Vector3d u = viewUp.cross(focus).normalize();
-        Vector3d v = focus.cross(u).normalize();
+        Vector3d focus = lookFrom.subtract(lookAt).normalized().scale(focusDist);
+        Vector3d u = viewUp.cross(focus).normalized();
+        Vector3d v = focus.cross(u).normalized();
 
         origin = lookFrom;
         horizontal = u.scale(viewportWidth);
@@ -42,8 +42,8 @@ public class Camera {
      */
     public Ray getRay(double u, double v) {
         double randomAngle = 2 * Math.PI * Math.random();
-        Vector3d randomDirection = horizontal.normalize().scale(Math.cos(randomAngle))
-                .add(vertical.normalize().scale(Math.sin(randomAngle)));
+        Vector3d randomDirection = horizontal.normalized().scale(Math.cos(randomAngle))
+                .add(vertical.normalized().scale(Math.sin(randomAngle)));
         Vector3d offset = randomDirection.scale(lensRadius);
 
         Vector3d point = bottomLeft.add(horizontal.scale(u)).add(vertical.scale(v));

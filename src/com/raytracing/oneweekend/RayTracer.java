@@ -9,11 +9,16 @@ import com.raytracing.utils.ProgressBar;
 import com.raytracing.utils.Canvas;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Random;
 
 public class RayTracer {
-    private static final double ASPECT_RATIO = 16.0 / 9.0;
-    private static final int IMAGE_WIDTH = 1080;
-    private static final int IMAGE_HEIGHT = (int) (IMAGE_WIDTH / ASPECT_RATIO) ;
+    private static final double ASPECT_RATIO = 3.0 / 2.0;
+    private static final int IMAGE_WIDTH = 400;
+    private static final int IMAGE_HEIGHT = (int) (IMAGE_WIDTH / ASPECT_RATIO);
 
     private static final double INFINITY = Double.MAX_VALUE;
     private static final double HIT_THRESHOLD = 1E-3;
@@ -22,6 +27,7 @@ public class RayTracer {
 
     private static Camera camera;
     private static final HittableList world = new HittableList();
+    private static final Random rng = new Random(42);
 
     public static void main(String[] args) throws IOException {
         initializeWorld();
@@ -45,7 +51,11 @@ public class RayTracer {
                     progressBar.show();
                 }
             }
-            canvas.save("depth_of_field.png");
+            // get timestamp to name the output image
+            LocalDateTime now = LocalDateTime.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+            canvas.save(Paths.get(System.getProperty("user.dir"), "outputs", now.format(formatter) + ".png").toString());
         }
     }
 
@@ -72,27 +82,59 @@ public class RayTracer {
     }
 
     private static void initializeWorld() {
-        var lookFrom = new Vector3d(3, 3, 2);
-        var lookAt = new Vector3d(0, 0, -1);
+        var lookFrom = new Vector3d(13, 2, 3);
+        var lookAt = new Vector3d(0, 0, 0);
         var viewUp = new Vector3d(0, 1, 0);
-        double distToFocus = lookAt.subtract(lookFrom).length();
-        double aperture = 2.0;
+        double distToFocus = 10;
+        double aperture = 0.1;
         camera = new Camera(lookFrom, lookAt, viewUp, 20, ASPECT_RATIO, aperture, distToFocus);
 
-        final Material groundMaterial = new Lambertian(new PixelColor(0.8, 0.8, 0));
-        final Material centerMaterial = new Lambertian(new PixelColor(0.1, 0.2, 0.5));
-        final Material leftMaterial = new Dielectric(1.5);
-        final Material rightMaterial = new Metal(new PixelColor(0.8, 0.6, 0.2), 0);
-        world.add(new Sphere(new Vector3d(0, -100.5, -1), 100, groundMaterial));
-        world.add(new Sphere(new Vector3d(0, 0, -1), 0.5, centerMaterial));
-        world.add(new Sphere(new Vector3d(-1, 0, -1), 0.5, leftMaterial));
-        world.add(new Sphere(new Vector3d(-1, 0, -1), -0.45, leftMaterial));
-        world.add(new Sphere(new Vector3d(1, 0, -1), 0.5, rightMaterial));
+        Material groundMaterial = new Lambertian(new PixelColor(0.5, 0.5, 0.5));
+        world.add(new Sphere(new Vector3d(0, -1000, 0), 1000, groundMaterial));
 
-//        final double R = Math.cos(Math.PI / 4);
-//        final Material leftMaterial = new Lambertian(new PixelColor(0, 0, 1));
-//        final Material rightMaterial = new Lambertian(new PixelColor(1, 0, 0));
-//        world.add(new Sphere(new Vector3d(-R, 0, -1), R, leftMaterial));
-//        world.add(new Sphere(new Vector3d(R, 0, -1), R, rightMaterial));
+        for (int a = -11; a < 11; a++) {
+            for (int b = -11; b < 11; b++) {
+                double chooseMaterial = rng.nextDouble();
+                var center = new Vector3d(a + rng.nextDouble(0.9), 0.2, b + rng.nextDouble(0.9));
+
+                if (center.subtract(new Vector3d(4, 0.2, 0)).length() > 0.9) {
+                    Material sphereMaterial;
+
+                    if (chooseMaterial < 0.8) {
+                        // diffuse
+                        var albedo = new PixelColor(
+                                rng.nextDouble() * rng.nextDouble(),
+                                rng.nextDouble() * rng.nextDouble(),
+                                rng.nextDouble() * rng.nextDouble()
+                        );
+                        sphereMaterial = new Lambertian(albedo);
+                        world.add(new Sphere(center, 0.2, sphereMaterial));
+                    } else if (chooseMaterial < 0.95) {
+                        // metal
+                        var albedo = new PixelColor(
+                                rng.nextDouble(0.5, 1),
+                                rng.nextDouble(0.5, 1),
+                                rng.nextDouble(0.5, 1)
+                        );
+                        var fuzz = rng.nextDouble(0.5);
+                        sphereMaterial = new Metal(albedo, fuzz);
+                        world.add(new Sphere(center, 0.2, sphereMaterial));
+                    } else {
+                        // glass
+                        sphereMaterial = new Dielectric(1.5);
+                        world.add(new Sphere(center, 0.2, sphereMaterial));
+                    }
+                }
+            }
+        }
+
+        var material1 = new Dielectric(1.5);
+        world.add(new Sphere(new Vector3d(0, 1, 0), 1, material1));
+
+        var material2 = new Lambertian(new PixelColor(0.4, 0.2, 0.1));
+        world.add(new Sphere(new Vector3d(-4, 1, 0), 1, material2));
+
+        var material3 = new Metal(new PixelColor(0.7, 0.6, 0.5), 0.0);
+        world.add(new Sphere(new Vector3d(4, 1, 0), 1, material3));
     }
 }

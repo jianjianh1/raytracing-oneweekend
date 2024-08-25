@@ -194,4 +194,4 @@ $RECYCLE.BIN/
 # Generated using ignr.py - github.com/Antrikshy/ignr.py
 
 # IGNORE generated images
-*.png
+outputs/

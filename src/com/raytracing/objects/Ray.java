@@ -25,7 +25,7 @@ public record Ray(Vector3d origin, Vector3d direction) {
      * @return the normalized direction
      */
     public Vector3d unitDirection() {
-        return direction.normalize();
+        return direction.normalized();
     }
 
     /**
