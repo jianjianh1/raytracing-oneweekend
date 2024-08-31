@@ -1,5 +1,6 @@
 package com.raytracing.oneweekend;
 
+import com.raytracing.base.Interval;
 import com.raytracing.base.PixelColor;
 import com.raytracing.base.Vector3d;
 import com.raytracing.interfaces.Hittable;
@@ -19,8 +20,7 @@ public class RayTracer {
     private static final int IMAGE_WIDTH = 400;
     private static final int IMAGE_HEIGHT = (int) (IMAGE_WIDTH / ASPECT_RATIO);
 
-    private static final double INFINITY = Double.MAX_VALUE;
-    private static final double HIT_THRESHOLD = 1E-3;
+    private static final double EPSILON = 1E-3;
     private static final int SAMPLES_PER_PIXEL = 100;
     private static final int MAX_DEPTH = 50;
 
@@ -63,7 +63,7 @@ public class RayTracer {
             return PixelColor.BLACK;
         }
 
-        Hittable.HitRecord hit = world.hit(ray, HIT_THRESHOLD, INFINITY);
+        Hittable.HitRecord hit = world.hit(ray, new Interval(EPSILON, Double.POSITIVE_INFINITY));
         if (hit != null) {
             Material.ScatterRecord scatter = hit.material().scatter(hit);
             if (scatter == null) {

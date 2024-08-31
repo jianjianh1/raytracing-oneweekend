@@ -1,6 +1,7 @@
 package com.raytracing.interfaces;
 
 import com.raytracing.base.Vector3d;
+import com.raytracing.base.Interval;
 import com.raytracing.objects.Ray;
 
 /**
@@ -70,4 +71,15 @@ public interface Hittable {
      * @return a {@code HitRecord}
      */
     HitRecord hit(Ray ray, double tMin, double tMax);
+
+    /**
+     * Returns a record if a ray hits an object within the given interval of t
+     *
+     * @param ray a ray
+     * @param tRange an interval of t
+     * @return a record if hit else null
+     */
+    default HitRecord hit(Ray ray, Interval tRange) {
+        return hit(ray, tRange.min(), tRange.max());
+    }
 }
