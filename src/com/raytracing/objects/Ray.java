@@ -8,7 +8,16 @@ import com.raytracing.base.Vector3d;
  * @param origin    the origin
  * @param direction the direction
  */
-public record Ray(Vector3d origin, Vector3d direction) {
+public record Ray(Vector3d origin, Vector3d direction, double time) {
+    /**
+     * Construct a ray that shoots at time 0.0
+     * @param origin the origin of ray
+     * @param direction the direction of ray
+     */
+    public Ray(Vector3d origin, Vector3d direction) {
+        this(origin, direction, 0.0);
+    }
+
     /**
      * Returns the position of the ray's end point at t
      *
