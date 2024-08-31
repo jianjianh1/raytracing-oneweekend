@@ -10,7 +10,37 @@ import com.raytracing.interfaces.Material;
  * @param center the center of the sphere
  * @param radius the radius of the sphere
  */
-public record Sphere(Vector3d center, double radius, Material material) implements Hittable {
+public record Sphere(Vector3d center, double radius, Material material, boolean isMoving, Vector3d velocity) implements Hittable {
+    /**
+     * Construct a sphere with the given center, radius, and material that's not moving
+     * @param center the center
+     * @param radius the radius
+     * @param material the material
+     */
+    public Sphere(Vector3d center, double radius, Material material) {
+        this(center, radius, material, false, Vector3d.ZERO);
+    }
+
+    /**
+     * Construct a moving sphere
+     * @param center1 the starting center position
+     * @param center2 the ending center position
+     * @param radius the radius
+     * @param material the material
+     */
+    public Sphere(Vector3d center1, Vector3d center2, double radius, Material material) {
+        this(center1, radius, material, true, center2.subtract(center1));
+    }
+
+    /**
+     * Get the center position at the given time
+     * @param time a time
+     * @return the center position
+     */
+    public Vector3d center(double time) {
+        return center.add(velocity.scale(time));
+    }
+
     /**
      * Returns the surface normal vector from a given point
      *
@@ -33,6 +63,7 @@ public record Sphere(Vector3d center, double radius, Material material) implemen
     public HitRecord hit(Ray ray, double tMin, double tMax) {
         // require us to solve (origin + t * direction - center) * (origin + t * direction - center) = r * r
         // we can write it as at^2 + bt + c = 0
+        Vector3d center = isMoving ? center(ray.time()) : this.center;
         Vector3d originToCenter = ray.origin().subtract(center);
         double a = ray.direction().lengthSquared();
         double halfB = ray.direction().dot(originToCenter); // negative
