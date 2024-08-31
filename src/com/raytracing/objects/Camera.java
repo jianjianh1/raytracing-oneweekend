@@ -48,8 +48,11 @@ public class Camera {
                     .add(vertical.normalized().scale(2.0 * Math.random() - 1.0));
         }
         offset = offset.scale(lensRadius);
-
         Vector3d point = bottomLeft.add(horizontal.scale(u)).add(vertical.scale(v));
-        return Ray.between(origin.add(offset), point);
+        Vector3d rayOrigin = origin.add(offset);
+        Vector3d rayDirection = point.subtract(rayOrigin);
+        double rayTime = Math.random();
+
+        return new Ray(rayOrigin, rayDirection, rayTime);
     }
 }
