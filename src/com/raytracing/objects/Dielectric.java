@@ -35,7 +35,7 @@ public record Dielectric(double indexOfRefraction) implements Material {
         } else {
             // refract
             Vector3d refractedDirection = in.refractOn(normal, refractionRatio);
-            Ray refractedRay = new Ray(hitRecord.point(), refractedDirection);
+            Ray refractedRay = new Ray(hitRecord.point(), refractedDirection, hitRecord.ray().time());
 
             return new ScatterRecord(attenuation, refractedRay);
         }

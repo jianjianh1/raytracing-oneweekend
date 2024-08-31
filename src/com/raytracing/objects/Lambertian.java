@@ -15,7 +15,7 @@ public record Lambertian(PixelColor albedo) implements Material {
     @Override
     public ScatterRecord scatter(Hittable.HitRecord hitRecord) {
         var scatterDirection = hitRecord.normal().add(Vector3d.randomUnit());
-        var scatteredRay = new Ray(hitRecord.point(), scatterDirection);
+        var scatteredRay = new Ray(hitRecord.point(), scatterDirection, hitRecord.ray().time());
         return new ScatterRecord(albedo, scatteredRay);
     }
 }
