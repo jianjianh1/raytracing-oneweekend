@@ -16,7 +16,7 @@ import java.util.Random;
 
 public class RayTracer {
     private static final double ASPECT_RATIO = 3.0 / 2.0;
-    private static final int IMAGE_WIDTH = 800;
+    private static final int IMAGE_WIDTH = 400;
     private static final int IMAGE_HEIGHT = (int) (IMAGE_WIDTH / ASPECT_RATIO);
 
     private static final double INFINITY = Double.MAX_VALUE;
@@ -107,7 +107,8 @@ public class RayTracer {
                                 rng.nextDouble() * rng.nextDouble()
                         );
                         sphereMaterial = new Lambertian(albedo);
-                        world.add(new Sphere(center, 0.2, sphereMaterial));
+                        var center2 = center.add(new Vector3d(0.0, rng.nextDouble(0.5), 0.0));
+                        world.add(new Sphere(center, center2, 0.2, sphereMaterial));
                     } else if (chooseMaterial < 0.95) {
                         // metal
                         var albedo = new PixelColor(
