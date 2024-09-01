@@ -30,6 +30,17 @@ public record Vector3d(double x, double y, double z) {
     }
 
     /**
+     * Get the component with corresponding index
+     */
+    public double component(int index) {
+        return switch (index) {
+            case 1 -> y;
+            case 2 -> z;
+            default -> x;
+        };
+    }
+
+    /**
      * Returns the length of the vector
      *
      * @return the length of the vector
