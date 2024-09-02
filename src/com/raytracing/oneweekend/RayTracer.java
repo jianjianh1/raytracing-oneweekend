@@ -19,20 +19,21 @@ import java.util.Random;
 public class RayTracer {
     private static final double EPSILON = 1E-3;
 
-    private static double aspectRatio;
+    private static double aspectRatio = 4.0 / 3.0;
     private static int imageWidth = 400;
     private static int samplesPerPixel = 100;
 
     private static int maxDepth = 50;
 
     private static Camera camera;
-    private static HittableList world;
+    private static HittableList world = new HittableList();
     private static final Random rng = new Random(42);
 
     public static void main(String[] args) throws IOException {
-        switch (2) {
+        switch (3) {
             case 1 -> boundingSpheres();
             case 2 -> checkeredSpheres();
+            case 3 -> earth();
         }
 
         int imageHeight = (int) (imageWidth / aspectRatio);
@@ -85,9 +86,26 @@ public class RayTracer {
         return PixelColor.WHITE.scale(1 - s).add(PixelColor.SKY_BLUE.scale(s));
     }
 
-    private static void checkeredSpheres() {
-        world = new HittableList();
+    private static void earth() throws IOException {
+        String texturePath = Paths.get(System.getProperty("user.dir"), "assets", "earthmap.jpg").toString();
+        ImageTexture earthTexture = new ImageTexture(texturePath);
+        Sphere globe = new Sphere(new Vector3d(), 2, new Lambertian(earthTexture));
+        world.add(globe);
 
+        aspectRatio = 16.0 / 9.0;
+        imageWidth = 400;
+        samplesPerPixel = 100;
+        maxDepth = 50;
+
+        double vFov = 20;
+        var lookFrom = new Vector3d(0, 0, 12);
+        var lookAt = new Vector3d();
+        var viewUp = new Vector3d(0, 1, 0);
+
+        camera = new Camera(lookFrom, lookAt, viewUp, vFov, aspectRatio);
+    }
+
+    private static void checkeredSpheres() {
         Texture checker = new CheckerTexture(0.32, new PixelColor(0.2, 0.3, 0.1), new PixelColor(0.9, 0.9, 0.9));
 
         world.add(new Sphere(new Vector3d(0, -10, 0), 10, new Lambertian(checker)));
@@ -107,9 +125,9 @@ public class RayTracer {
     }
 
     private static void boundingSpheres() {
-       aspectRatio = 3.0 / 2.0;
-       imageWidth = 400;
-       samplesPerPixel = 100;
+        aspectRatio = 3.0 / 2.0;
+        imageWidth = 400;
+        samplesPerPixel = 100;
 
         var lookFrom = new Vector3d(13, 2, 3);
         var lookAt = new Vector3d(0, 0, 0);
@@ -118,7 +136,6 @@ public class RayTracer {
         double aperture = 0.1;
         camera = new Camera(lookFrom, lookAt, viewUp, 20, aspectRatio, aperture, distToFocus);
 
-        world = new HittableList();
         Texture checker = new CheckerTexture(0.32, new PixelColor(0.2, 0.3, 0.1), new PixelColor(0.9, 0.9, 0.9));
         Material groundMaterial = new Lambertian(checker);
         world.add(new Sphere(new Vector3d(0, -1000, 0), 1000, groundMaterial));

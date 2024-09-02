@@ -77,20 +77,18 @@ public record Sphere(Vector3d center, double radius, Material material, boolean 
         }
 
         if (tMin <= t && t <= tMax) {
-            var hit =  new HitRecord(ray, t, normalAt(ray.at(t)), material);
-            Vector3d uv = getSphereUV(hit.normal());
-            hit = new HitRecord(ray, t, normalAt(ray.at(t)), material, uv.x(), uv.y());
-            return hit;
+            Vector3d outwardNormal = normalAt(ray.at(t));
+            Vector3d uv = getSphereUV(outwardNormal);
+            return new HitRecord(ray, t, outwardNormal, material, uv.x(), uv.y());
         } else {
             t = (-halfB + Math.sqrt(quarterDiscriminant)) / a; // second intersection
         }
 
         // check second intersection
         if (tMin <= t && t <= tMax) {
-            var hit =  new HitRecord(ray, t, normalAt(ray.at(t)), material);
-            Vector3d uv = getSphereUV(hit.normal());
-            hit = new HitRecord(ray, t, normalAt(ray.at(t)), material, uv.x(), uv.y());
-            return hit;
+            Vector3d outwardNormal = normalAt(ray.at(t));
+            Vector3d uv = getSphereUV(outwardNormal);
+            return new HitRecord(ray, t, outwardNormal, material, uv.x(), uv.y());
         } else {
             return null;
         }
@@ -103,8 +101,8 @@ public record Sphere(Vector3d center, double radius, Material material, boolean 
      */
     private static Vector3d getSphereUV(Vector3d p) {
         p = p.normalized();
-        double theta = Math.acos(p.y());
-        double phi = Math.atan2(p.z(), p.x()) + Math.PI;
+        double theta = Math.acos(-p.y());
+        double phi = Math.atan2(-p.z(), p.x()) + Math.PI;
 
         return new Vector3d(phi / (2.0 * Math.PI), theta / Math.PI, 0.0);
     }
