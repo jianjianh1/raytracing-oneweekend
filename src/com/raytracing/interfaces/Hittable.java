@@ -32,6 +32,13 @@ public interface Hittable {
         }
 
         /**
+         * Construct a hit record with (u, v) coordinate information
+         */
+        public HitRecord(Ray ray, double t, Vector3d normal, Material material, double u, double v) {
+            this(ray, t, normal, frontFace(ray, normal), material, u, v);
+        }
+
+        /**
          * Returns the surface normal where the ray hit, that is the outward normal
          * if the ray hit outward else inward normal.
          *

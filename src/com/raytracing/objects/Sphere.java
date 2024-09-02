@@ -75,15 +75,37 @@ public record Sphere(Vector3d center, double radius, Material material, boolean 
         } else {
             t = (-halfB - Math.sqrt(quarterDiscriminant)) / a; // first intersection
         }
+
         if (tMin <= t && t <= tMax) {
-            return new HitRecord(ray, t, normalAt(ray.at(t)), material);
+            var hit =  new HitRecord(ray, t, normalAt(ray.at(t)), material);
+            Vector3d uv = getSphereUV(hit.normal());
+            hit = new HitRecord(ray, t, normalAt(ray.at(t)), material, uv.x(), uv.y());
+            return hit;
         } else {
             t = (-halfB + Math.sqrt(quarterDiscriminant)) / a; // second intersection
         }
+
+        // check second intersection
         if (tMin <= t && t <= tMax) {
-            return new HitRecord(ray, t, normalAt(ray.at(t)), material);
+            var hit =  new HitRecord(ray, t, normalAt(ray.at(t)), material);
+            Vector3d uv = getSphereUV(hit.normal());
+            hit = new HitRecord(ray, t, normalAt(ray.at(t)), material, uv.x(), uv.y());
+            return hit;
         } else {
             return null;
         }
+    }
+
+    /**
+     * Get the (u, v) coordinates by a 3D position
+     *
+     * @return (u, v) coordinates as the first components in a 3D vector
+     */
+    private static Vector3d getSphereUV(Vector3d p) {
+        p = p.normalized();
+        double theta = Math.acos(p.y());
+        double phi = Math.atan2(p.z(), p.x()) + Math.PI;
+
+        return new Vector3d(phi / (2.0 * Math.PI), theta / Math.PI, 0.0);
     }
 }
