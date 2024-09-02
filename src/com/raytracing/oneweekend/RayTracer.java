@@ -17,25 +17,26 @@ import java.time.format.DateTimeFormatter;
 import java.util.Random;
 
 public class RayTracer {
+    private static final Random rng = new Random(42);
     private static final double EPSILON = 1E-3;
 
     private static double aspectRatio = 4.0 / 3.0;
     private static int imageWidth = 400;
     private static int samplesPerPixel = 100;
-
     private static int maxDepth = 50;
 
+    private static PixelColor background = new PixelColor(0.7, 0.8, 1.0);
     private static Camera camera;
     private static HittableList world = new HittableList();
-    private static final Random rng = new Random(42);
 
     public static void main(String[] args) throws IOException {
-        switch (5) {
+        switch (6) {
             case 1 -> boundingSpheres();
             case 2 -> checkeredSpheres();
             case 3 -> earth();
             case 4 -> perlinSpheres();
             case 5 -> quads();
+            case 6 -> sampleLight();
         }
 
         int imageHeight = (int) (imageWidth / aspectRatio);
@@ -72,20 +73,40 @@ public class RayTracer {
         }
 
         Hittable.HitRecord hit = world.hit(ray, new Interval(EPSILON, Double.POSITIVE_INFINITY));
-        if (hit != null) {
-            Material.ScatterRecord scatter = hit.material().scatter(hit);
-            if (scatter == null) {
-                return PixelColor.BLACK;
-            }
-            return rayColor(scatter.scatteredRay(), depth - 1).dot(scatter.attenuation());
+        if (hit == null) return background;
+
+        PixelColor colorFromEmission = hit.material().emitted(hit.u(), hit.v(), hit.point());
+
+        Material.ScatterRecord scatter = hit.material().scatter(hit);
+        if (scatter == null) {
+            return colorFromEmission;
         }
+        PixelColor colorFromScatter = rayColor(scatter.scatteredRay(), depth - 1).dot(scatter.attenuation());
 
-        // no hit
-        Vector3d unitDirection = ray.unitDirection();
-        float s = (float) (0.5 * (unitDirection.y() + 1.0)); // [-1.0, 1.0]
+        return colorFromEmission.add(colorFromScatter);
+    }
 
-        // blend white (1.0F, 1.0F, 1.0F) and sky blue (0.5F, 0.7F, 1.0F)
-        return PixelColor.WHITE.scale(1 - s).add(PixelColor.SKY_BLUE.scale(s));
+    private static void sampleLight() {
+        NoiseTexture perlin = new NoiseTexture(4.0);
+        world.add(new Sphere(new Vector3d(0, -1000, 0), 1000, new Lambertian(perlin)));
+        world.add(new Sphere(new Vector3d(0, 2, 0), 2, new Lambertian(perlin)));
+
+        DiffuseLight diffuseLight = new DiffuseLight(new PixelColor(4, 4, 4));
+        world.add(new Sphere(new Vector3d(0, 7, 0), 2, diffuseLight));
+        world.add(new Quad(new Vector3d(3, 1, -2), new Vector3d(2, 0, 0), new Vector3d(0, 2, 0), diffuseLight));
+
+        aspectRatio = 16.0 / 9.0;
+        imageWidth = 400;
+        samplesPerPixel = 100;
+        maxDepth = 50;
+        background = PixelColor.BLACK;
+
+        double vFov = 20;
+        var lookFrom = new Vector3d(26, 3, 6);
+        var lookAt = new Vector3d(0, 2, 0);
+        var viewUp = new Vector3d(0, 1, 0);
+
+        camera = new Camera(lookFrom, lookAt, viewUp, vFov, aspectRatio);
     }
 
     private static void quads() {

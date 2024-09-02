@@ -1,6 +1,7 @@
 package com.raytracing.interfaces;
 
 import com.raytracing.base.PixelColor;
+import com.raytracing.base.Vector3d;
 import com.raytracing.objects.Ray;
 
 /**
@@ -13,14 +14,22 @@ public interface Material {
      * @param attenuation  the attenuated color
      * @param scatteredRay the scattered ray
      */
-    record ScatterRecord(PixelColor attenuation, Ray scatteredRay) {
-    }
+    record ScatterRecord(PixelColor attenuation, Ray scatteredRay) {}
 
     /**
-     * Returns a record of scattering of a hit.
+     * Returns a record of scattering of a hit. Default returns null
      *
      * @param hitRecord the hit record
      * @return a scatter record
      */
-    ScatterRecord scatter(Hittable.HitRecord hitRecord);
+    default ScatterRecord scatter(Hittable.HitRecord hitRecord) {
+        return null;
+    }
+
+    /**
+     * Default emit no light
+     */
+    default PixelColor emitted(double u, double v, Vector3d p) {
+        return PixelColor.BLACK;
+    }
 }
