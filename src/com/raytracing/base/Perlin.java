@@ -30,6 +30,9 @@ public class Perlin {
         double u = p.x() - Math.floor(p.x());
         double v = p.y() - Math.floor(p.y());
         double w = p.z() - Math.floor(p.z());
+        u = u * u * (3 - 2 * u);
+        v = v * v * (3 - 2 * v);
+        w = w * w * (3 - 2 * w);
 
         int i = (int)Math.floor(p.x());
         int j = (int)Math.floor(p.y());
