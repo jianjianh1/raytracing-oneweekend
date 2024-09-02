@@ -64,4 +64,11 @@ public record Interval(double min, double max) {
         double padding = delta / 2.0;
         return new Interval(min - padding, max + padding);
     }
+
+    /**
+     * Translates the interval by a given amount
+     */
+    public Interval translate(double displacement) {
+        return new Interval(min + displacement, max + displacement);
+    }
 }

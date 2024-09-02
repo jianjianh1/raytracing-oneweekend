@@ -104,4 +104,15 @@ public class AABB {
     public boolean hit(Ray ray, Interval tRange) {
         return hit(ray, tRange.min(), tRange.max());
     }
+
+    /**
+     * Translates the AABB by a given offset
+     */
+    public AABB translate(Vector3d offset) {
+        return new AABB(
+                xRange.translate(offset.x()),
+                yRange.translate(offset.y()),
+                zRange.translate(offset.z())
+        );
+    }
 }
