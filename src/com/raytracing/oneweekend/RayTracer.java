@@ -88,7 +88,7 @@ public class RayTracer {
     }
 
     private static void perlinSpheres() {
-        NoiseTexture perlin = new NoiseTexture();
+        NoiseTexture perlin = new NoiseTexture(4.0);
         world.add(new Sphere(new Vector3d(0, -1000, 0), 1000, new Lambertian(perlin)));
         world.add(new Sphere(new Vector3d(0, 2, 0), 2, new Lambertian(perlin)));
 
