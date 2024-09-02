@@ -13,6 +13,12 @@ public class Camera {
     private final double lensRadius;
 
     /**
+     * Constructs a camera with default depth of field
+     */
+    public Camera(Vector3d lookFrom, Vector3d lookAt, Vector3d viewUp, double verticalFOV, double aspectRatio) {
+        this(lookFrom, lookAt, viewUp, verticalFOV, aspectRatio, 0.0, 10.0);
+    }
+    /**
      * Initialize a camera with the default specifications.
      */
     public Camera(Vector3d lookFrom, Vector3d lookAt, Vector3d viewUp, double verticalFOV, double aspectRatio,

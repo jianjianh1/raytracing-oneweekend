@@ -17,33 +17,37 @@ import java.time.format.DateTimeFormatter;
 import java.util.Random;
 
 public class RayTracer {
-    private static final double ASPECT_RATIO = 3.0 / 2.0;
-    private static final int IMAGE_WIDTH = 400;
-    private static final int IMAGE_HEIGHT = (int) (IMAGE_WIDTH / ASPECT_RATIO);
-
     private static final double EPSILON = 1E-3;
-    private static final int SAMPLES_PER_PIXEL = 100;
-    private static final int MAX_DEPTH = 50;
+
+    private static double aspectRatio;
+    private static int imageWidth = 400;
+    private static int samplesPerPixel = 100;
+
+    private static int maxDepth = 50;
 
     private static Camera camera;
-    private static HittableList world = new HittableList();
+    private static HittableList world;
     private static final Random rng = new Random(42);
 
     public static void main(String[] args) throws IOException {
-        initializeWorld();
+        switch (2) {
+            case 1 -> boundingSpheres();
+            case 2 -> checkeredSpheres();
+        }
 
-        ProgressBar progressBar = new ProgressBar(IMAGE_WIDTH * IMAGE_HEIGHT);
+        int imageHeight = (int) (imageWidth / aspectRatio);
+        ProgressBar progressBar = new ProgressBar(imageWidth * imageHeight);
 
-        try (Canvas canvas = new Canvas(IMAGE_WIDTH, IMAGE_HEIGHT)) {
-            for (int x = 0; x < IMAGE_WIDTH; x++) {
-                for (int y = 0; y < IMAGE_HEIGHT; y++) {
+        try (Canvas canvas = new Canvas(imageWidth, imageHeight)) {
+            for (int x = 0; x < imageWidth; x++) {
+                for (int y = 0; y < imageHeight; y++) {
                     PixelColor pixel = new PixelColor();
-                    for (int i = 0; i < SAMPLES_PER_PIXEL; i++) {
-                        double u = (x + Math.random()) / (IMAGE_WIDTH - 1);
-                        double v = (y + Math.random()) / (IMAGE_HEIGHT - 1);
+                    for (int i = 0; i < samplesPerPixel; i++) {
+                        double u = (x + Math.random()) / (imageWidth - 1);
+                        double v = (y + Math.random()) / (imageHeight - 1);
                         // ray start from origin and hit at u portion of width and v portion of height
                         Ray ray = camera.getRay(u, v);
-                        pixel.addSample(rayColor(ray, MAX_DEPTH));
+                        pixel.addSample(rayColor(ray, maxDepth));
                     }
                     canvas.fillPixel(x, y, pixel.color());
 
@@ -81,14 +85,40 @@ public class RayTracer {
         return PixelColor.WHITE.scale(1 - s).add(PixelColor.SKY_BLUE.scale(s));
     }
 
-    private static void initializeWorld() {
+    private static void checkeredSpheres() {
+        world = new HittableList();
+
+        Texture checker = new CheckerTexture(0.32, new PixelColor(0.2, 0.3, 0.1), new PixelColor(0.9, 0.9, 0.9));
+
+        world.add(new Sphere(new Vector3d(0, -10, 0), 10, new Lambertian(checker)));
+        world.add(new Sphere(new Vector3d(0, 10, 0), 10, new Lambertian(checker)));
+
+        aspectRatio = 16.0 / 9.0;
+        imageWidth = 400;
+        samplesPerPixel = 100;
+        maxDepth = 50;
+
+        double vFov = 20;
+        var lookFrom = new Vector3d(13, 2, 3);
+        var lookAt = new Vector3d();
+        var viewUp = new Vector3d(0, 1, 0);
+
+        camera = new Camera(lookFrom, lookAt, viewUp, vFov, aspectRatio);
+    }
+
+    private static void boundingSpheres() {
+       aspectRatio = 3.0 / 2.0;
+       imageWidth = 400;
+       samplesPerPixel = 100;
+
         var lookFrom = new Vector3d(13, 2, 3);
         var lookAt = new Vector3d(0, 0, 0);
         var viewUp = new Vector3d(0, 1, 0);
         double distToFocus = 10;
         double aperture = 0.1;
-        camera = new Camera(lookFrom, lookAt, viewUp, 20, ASPECT_RATIO, aperture, distToFocus);
+        camera = new Camera(lookFrom, lookAt, viewUp, 20, aspectRatio, aperture, distToFocus);
 
+        world = new HittableList();
         Texture checker = new CheckerTexture(0.32, new PixelColor(0.2, 0.3, 0.1), new PixelColor(0.9, 0.9, 0.9));
         Material groundMaterial = new Lambertian(checker);
         world.add(new Sphere(new Vector3d(0, -1000, 0), 1000, groundMaterial));
