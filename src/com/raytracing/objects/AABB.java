@@ -6,7 +6,21 @@ import com.raytracing.base.Vector3d;
 /**
  * Axis-Aligned Bounding Box
  */
-public record AABB(Interval xRange, Interval yRange, Interval zRange) {
+public class AABB {
+    private static final double EPSILON = 1e-3;
+
+    private final Interval xRange;
+    private final Interval yRange;
+    private final Interval zRange;
+
+    /**
+     * Constructs an AABB with the given xyz intervals expanded a little
+     */
+    public AABB(Interval x, Interval y, Interval z) {
+        xRange = x.expand(EPSILON);
+        yRange = y.expand(EPSILON);
+        zRange = z.expand(EPSILON);
+    }
 
     /**
      * Constructs an empty AABB

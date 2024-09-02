@@ -10,7 +10,7 @@ import java.util.Random;
  * @param z the z-coordinate
  */
 public record Vector3d(double x, double y, double z) {
-    private static final Random rng = new Random();
+    private static final Random rng = new Random(42);
 
     /**
      * The zero vector

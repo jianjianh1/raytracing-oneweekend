@@ -6,7 +6,7 @@ import java.util.Random;
 
 public class Perlin {
     private static final int pointCount = 256;
-    private static final Random rng = new Random();
+    private static final Random rng = new Random(42);
     private final Vector3d[] randVec = new Vector3d[pointCount];
     private final int[] permX = new int[pointCount];
     private final int[] permY = new int[pointCount];
