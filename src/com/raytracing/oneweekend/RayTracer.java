@@ -30,13 +30,14 @@ public class RayTracer {
     private static HittableList world = new HittableList();
 
     public static void main(String[] args) throws IOException {
-        switch (6) {
+        switch (7) {
             case 1 -> boundingSpheres();
             case 2 -> checkeredSpheres();
             case 3 -> earth();
             case 4 -> perlinSpheres();
             case 5 -> quads();
             case 6 -> sampleLight();
+            case 7 -> cornellBox();
         }
 
         int imageHeight = (int) (imageWidth / aspectRatio);
@@ -84,6 +85,36 @@ public class RayTracer {
         PixelColor colorFromScatter = rayColor(scatter.scatteredRay(), depth - 1).dot(scatter.attenuation());
 
         return colorFromEmission.add(colorFromScatter);
+    }
+
+    private static void cornellBox() {
+        var red = new Lambertian(new PixelColor(0.65, 0.05, 0.05));
+        var white = new Lambertian(new PixelColor(0.73, 0.73, 0.73));
+        var green = new Lambertian(new PixelColor(0.12, 0.45, 0.15));
+        var light = new DiffuseLight(new PixelColor(15, 15, 15));
+
+        world.add(new Quad(new Vector3d(555, 0, 0), new Vector3d(0, 555, 0), new Vector3d(0, 0, 555), green));
+        world.add(new Quad(new Vector3d(0, 0, 0), new Vector3d(0, 555, 0), new Vector3d(0, 0, 555), red));
+        world.add(new Quad(new Vector3d(343, 554, 332), new Vector3d(-130, 0, 0), new Vector3d(0, 0, -105), light));
+        world.add(new Quad(new Vector3d(0, 0, 0), new Vector3d(555, 0, 0), new Vector3d(0, 0, 555), white));
+        world.add(new Quad(new Vector3d(555, 555, 555), new Vector3d(-555, 0, 0), new Vector3d(0, 0, -555), white));
+        world.add(new Quad(new Vector3d(0,0, 555), new Vector3d(555, 0, 0), new Vector3d(0, 555, 0), white));
+
+        world.add(new Box(new Vector3d(130, 0, 65), new Vector3d(295, 165, 230), white));
+        world.add(new Box(new Vector3d(265, 0, 295), new Vector3d(430, 330, 460), white));
+
+        aspectRatio = 1.0;
+        imageWidth = 600;
+        samplesPerPixel = 200;
+        maxDepth = 50;
+        background = PixelColor.BLACK;
+
+        double vFov = 40;
+        var lookFrom = new Vector3d(278, 278, -800);
+        var lookAt = new Vector3d(278, 278, 0);
+        var viewUp = new Vector3d(0, 1, 0);
+
+        camera = new Camera(lookFrom, lookAt, viewUp, vFov, aspectRatio);
     }
 
     private static void sampleLight() {
