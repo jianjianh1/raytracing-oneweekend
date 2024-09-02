@@ -1,4 +1,4 @@
-package com.raytracing.base;
+package com.raytracing.textures;
 
 import com.raytracing.base.Vector3d;
 

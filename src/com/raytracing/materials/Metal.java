@@ -1,9 +1,10 @@
-package com.raytracing.objects;
+package com.raytracing.materials;
 
 import com.raytracing.base.PixelColor;
 import com.raytracing.base.Vector3d;
 import com.raytracing.interfaces.Hittable;
 import com.raytracing.interfaces.Material;
+import com.raytracing.scene.Ray;
 
 public record Metal(PixelColor albedo, double fuzziness) implements Material {
     /**

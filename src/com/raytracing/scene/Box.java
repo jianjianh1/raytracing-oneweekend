@@ -1,4 +1,4 @@
-package com.raytracing.objects;
+package com.raytracing.scene;
 
 import com.raytracing.base.Vector3d;
 import com.raytracing.interfaces.Material;

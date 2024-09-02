@@ -1,7 +1,6 @@
-package com.raytracing.objects;
+package com.raytracing.base;
 
-import com.raytracing.base.Interval;
-import com.raytracing.base.Vector3d;
+import com.raytracing.scene.Ray;
 
 /**
  * Axis-Aligned Bounding Box
@@ -79,7 +78,7 @@ public class AABB {
     /**
      * @return Whether a ray hits this AABB within the given range of t
      */
-    boolean hit(Ray ray, double tMin, double tMax) {
+    public boolean hit(Ray ray, double tMin, double tMax) {
         for (int axis = 0; axis < 3; axis++) {
             Interval ax = axisInterval(axis);
             double dInv = 1.0 / ray.direction().component(axis);
@@ -102,7 +101,7 @@ public class AABB {
     /**
      * @return Whether a ray hits this AABB within the given range of t (represented as an interval)
      */
-    boolean hit(Ray ray, Interval tRange) {
+    public boolean hit(Ray ray, Interval tRange) {
         return hit(ray, tRange.min(), tRange.max());
     }
 }

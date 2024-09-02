@@ -1,4 +1,4 @@
-package com.raytracing.oneweekend;
+package com.raytracing.app;
 
 import com.raytracing.base.Interval;
 import com.raytracing.base.PixelColor;
@@ -6,7 +6,15 @@ import com.raytracing.base.Vector3d;
 import com.raytracing.interfaces.Hittable;
 import com.raytracing.interfaces.Material;
 import com.raytracing.interfaces.Texture;
-import com.raytracing.objects.*;
+import com.raytracing.materials.Dielectric;
+import com.raytracing.materials.DiffuseLight;
+import com.raytracing.materials.Lambertian;
+import com.raytracing.materials.Metal;
+import com.raytracing.scene.*;
+import com.raytracing.structures.BVHNode;
+import com.raytracing.textures.CheckerTexture;
+import com.raytracing.textures.ImageTexture;
+import com.raytracing.textures.NoiseTexture;
 import com.raytracing.utils.ProgressBar;
 import com.raytracing.utils.Canvas;
 

@@ -1,10 +1,10 @@
-package com.raytracing.objects;
+package com.raytracing.materials;
 
 import com.raytracing.base.PixelColor;
 import com.raytracing.base.Vector3d;
-import com.raytracing.interfaces.Hittable;
 import com.raytracing.interfaces.Material;
 import com.raytracing.interfaces.Texture;
+import com.raytracing.textures.SolidColor;
 
 public record DiffuseLight(Texture texture) implements Material {
 

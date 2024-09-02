@@ -1,8 +1,9 @@
-package com.raytracing.objects;
+package com.raytracing.scene;
 
 import com.raytracing.base.Vector3d;
 import com.raytracing.interfaces.Hittable;
 import com.raytracing.interfaces.Material;
+import com.raytracing.base.AABB;
 
 public record Sphere(Vector3d center, double radius, Material material, boolean isMoving, Vector3d velocity, AABB boundingBox) implements Hittable {
     /**

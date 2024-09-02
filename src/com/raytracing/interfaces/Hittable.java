@@ -2,8 +2,8 @@ package com.raytracing.interfaces;
 
 import com.raytracing.base.Vector3d;
 import com.raytracing.base.Interval;
-import com.raytracing.objects.AABB;
-import com.raytracing.objects.Ray;
+import com.raytracing.base.AABB;
+import com.raytracing.scene.Ray;
 
 /**
  * Represents objects that could be hit by {@code Ray}.

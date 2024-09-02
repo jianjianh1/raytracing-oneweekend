@@ -1,6 +1,9 @@
-package com.raytracing.objects;
+package com.raytracing.structures;
 
+import com.raytracing.base.AABB;
 import com.raytracing.interfaces.Hittable;
+import com.raytracing.scene.HittableList;
+import com.raytracing.scene.Ray;
 
 import java.util.*;
 
