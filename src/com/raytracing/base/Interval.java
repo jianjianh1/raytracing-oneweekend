@@ -3,6 +3,7 @@ package com.raytracing.base;
 public record Interval(double min, double max) {
     public static final Interval EMPTY = new Interval();
     public static final Interval UNIVERSE = new Interval(Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
+    public static final Interval UNIT = new Interval(0.0, 1.0);
 
     /**
      * Constructs an empty interval

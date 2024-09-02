@@ -30,11 +30,12 @@ public class RayTracer {
     private static final Random rng = new Random(42);
 
     public static void main(String[] args) throws IOException {
-        switch (4) {
+        switch (5) {
             case 1 -> boundingSpheres();
             case 2 -> checkeredSpheres();
             case 3 -> earth();
             case 4 -> perlinSpheres();
+            case 5 -> quads();
         }
 
         int imageHeight = (int) (imageWidth / aspectRatio);
@@ -85,6 +86,32 @@ public class RayTracer {
 
         // blend white (1.0F, 1.0F, 1.0F) and sky blue (0.5F, 0.7F, 1.0F)
         return PixelColor.WHITE.scale(1 - s).add(PixelColor.SKY_BLUE.scale(s));
+    }
+
+    private static void quads() {
+        var leftRed = new Lambertian(new PixelColor(1.0, 0.2, 0.2));
+        var backGreen = new Lambertian(new PixelColor(0.2, 1.0, 0.2));
+        var rightBlue = new Lambertian(new PixelColor(0.2, 0.2, 1.0));
+        var upperOrange = new Lambertian(new PixelColor(1.0, 0.5, 0.0));
+        var lowerTeal = new Lambertian(new PixelColor(0.2, 0.8, 0.8));
+
+        world.add(new Quad(new Vector3d(-3, -2, 5), new Vector3d(0, 0, -4), new Vector3d(0, 4, 0), leftRed));
+        world.add(new Quad(new Vector3d(-2, -2, 0), new Vector3d(4, 0, 0), new Vector3d(0, 4, 0), backGreen));
+        world.add(new Quad(new Vector3d(3, -2, 1), new Vector3d(0, 0, 4), new Vector3d(0, 4, 0), rightBlue));
+        world.add(new Quad(new Vector3d(-2, 3, 1), new Vector3d(4, 0, 0), new Vector3d(0, 0, 4), upperOrange));
+        world.add(new Quad(new Vector3d(-2, -3, 5), new Vector3d(4, 0, 0), new Vector3d(0, 0, -4), lowerTeal));
+
+        aspectRatio = 1.0;
+        imageWidth = 400;
+        samplesPerPixel = 100;
+        maxDepth = 50;
+
+        double vFov = 80;
+        var lookFrom = new Vector3d(0, 0, 9);
+        var lookAt = new Vector3d();
+        var viewUp = new Vector3d(0, 1, 0);
+
+        camera = new Camera(lookFrom, lookAt, viewUp, vFov, aspectRatio);
     }
 
     private static void perlinSpheres() {
