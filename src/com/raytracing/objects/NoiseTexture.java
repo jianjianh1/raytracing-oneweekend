@@ -26,7 +26,7 @@ public record NoiseTexture(Perlin noise, double scale) implements Texture {
      */
     @Override
     public PixelColor value(double u, double v, Vector3d p) {
-        double color = noise.noise(p.scale(scale));
+        double color = 0.5 + 0.5 * noise.noise(p.scale(scale));
         return new PixelColor(color, color, color);
     }
 }
