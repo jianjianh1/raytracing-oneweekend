@@ -48,6 +48,20 @@ public class Perlin {
     }
 
     /**
+     * Turbulence, a sum of repeated calls to noise
+     */
+    public double turbulence(Vector3d p, int depth) {
+        double result = 0.0;
+        double weight = 1.0;
+        for (int i = 0; i < depth; i++) {
+            result += weight * noise(p);
+            weight *= 0.5;
+            p = p.scale(2);
+        }
+        return Math.abs(result);
+    }
+
+    /**
      * Permute an array by swapping elements randomly
      */
     private static void permute(int[] p) {
