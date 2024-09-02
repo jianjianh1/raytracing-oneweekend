@@ -25,7 +25,7 @@ public class RayTracer {
     private static final int MAX_DEPTH = 50;
 
     private static Camera camera;
-    private static final HittableList world = new HittableList();
+    private static HittableList world = new HittableList();
     private static final Random rng = new Random(42);
 
     public static void main(String[] args) throws IOException {
@@ -136,5 +136,7 @@ public class RayTracer {
 
         var material3 = new Metal(new PixelColor(0.7, 0.6, 0.5), 0.0);
         world.add(new Sphere(new Vector3d(4, 1, 0), 1, material3));
+
+        world = new HittableList(new BVHNode(world));
     }
 }

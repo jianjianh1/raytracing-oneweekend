@@ -51,6 +51,18 @@ public record AABB(Interval xRange, Interval yRange, Interval zRange) {
     }
 
     /**
+     * @return The index of longest axis
+     */
+    public int longestAxis() {
+        double xSize = xRange.size();
+        double ySize = yRange.size();
+        double zSize = zRange.size();
+        if (xSize >= ySize && xSize >= zSize) return 0;
+        else if (ySize >= xSize && ySize >= zSize) return 1;
+        else return 2;
+    }
+
+    /**
      * @return Whether a ray hits this AABB within the given range of t
      */
     boolean hit(Ray ray, double tMin, double tMax) {
