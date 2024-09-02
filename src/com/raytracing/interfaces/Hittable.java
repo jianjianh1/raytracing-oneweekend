@@ -2,6 +2,7 @@ package com.raytracing.interfaces;
 
 import com.raytracing.base.Vector3d;
 import com.raytracing.base.Interval;
+import com.raytracing.objects.AABB;
 import com.raytracing.objects.Ray;
 
 /**
@@ -82,4 +83,9 @@ public interface Hittable {
     default HitRecord hit(Ray ray, Interval tRange) {
         return hit(ray, tRange.min(), tRange.max());
     }
+
+    /**
+     * @return The bounding box of hittable object
+     */
+    AABB boundingBox();
 }

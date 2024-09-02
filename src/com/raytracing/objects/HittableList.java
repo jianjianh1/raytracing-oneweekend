@@ -11,12 +11,14 @@ import java.util.List;
  */
 public class HittableList implements Hittable, Iterable<Hittable> {
     private final List<Hittable> list;
+    private AABB boundingBox;
 
     /**
      * Constructs an empty list of {@code Hittable}.
      */
     public HittableList() {
         list = new ArrayList<>();
+        boundingBox = new AABB();
     }
 
     /**
@@ -26,6 +28,7 @@ public class HittableList implements Hittable, Iterable<Hittable> {
      */
     public void add(Hittable hittable) {
         list.add(hittable);
+        boundingBox = new AABB(boundingBox, hittable.boundingBox());
     }
 
     /**
@@ -51,6 +54,14 @@ public class HittableList implements Hittable, Iterable<Hittable> {
     }
 
     /**
+     * @return The bounding box of the list of hittable objects
+     */
+    @Override
+    public AABB boundingBox() {
+        return boundingBox;
+    }
+
+    /**
      * Returns an iterator over elements of type {@code Hittable}.
      *
      * @return an Iterator.
@@ -58,5 +69,12 @@ public class HittableList implements Hittable, Iterable<Hittable> {
     @Override
     public Iterator<Hittable> iterator() {
         return list.iterator();
+    }
+
+    /**
+     * @return The list of objects
+     */
+    public List<Hittable> objects() {
+        return list;
     }
 }

@@ -4,13 +4,7 @@ import com.raytracing.base.Vector3d;
 import com.raytracing.interfaces.Hittable;
 import com.raytracing.interfaces.Material;
 
-/**
- * Represents a sphere that can be hit by a ray
- *
- * @param center the center of the sphere
- * @param radius the radius of the sphere
- */
-public record Sphere(Vector3d center, double radius, Material material, boolean isMoving, Vector3d velocity) implements Hittable {
+public record Sphere(Vector3d center, double radius, Material material, boolean isMoving, Vector3d velocity, AABB boundingBox) implements Hittable {
     /**
      * Construct a sphere with the given center, radius, and material that's not moving
      * @param center the center
@@ -18,7 +12,7 @@ public record Sphere(Vector3d center, double radius, Material material, boolean 
      * @param material the material
      */
     public Sphere(Vector3d center, double radius, Material material) {
-        this(center, radius, material, false, Vector3d.ZERO);
+        this(center, radius, material, false, Vector3d.ZERO, new AABB(center.subtract(Vector3d.ONES.scale(radius)), center.add(Vector3d.ONES.scale(radius))));
     }
 
     /**
@@ -29,7 +23,12 @@ public record Sphere(Vector3d center, double radius, Material material, boolean 
      * @param material the material
      */
     public Sphere(Vector3d center1, Vector3d center2, double radius, Material material) {
-        this(center1, radius, material, true, center2.subtract(center1));
+        this(center1, radius, material, true, center2.subtract(center1),
+                new AABB(
+                        new AABB(center1.subtract(Vector3d.ONES.scale(radius)), center1.add(Vector3d.ONES.scale(radius))),
+                        new AABB(center2.subtract(Vector3d.ONES.scale(radius)), center2.add(Vector3d.ONES.scale(radius)))
+                )
+        );
     }
 
     /**

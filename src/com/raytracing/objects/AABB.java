@@ -27,6 +27,17 @@ public record AABB(Interval xRange, Interval yRange, Interval zRange) {
     }
 
     /**
+     * Constructs an AABB that contains the two boxes
+     */
+    public AABB(AABB box1, AABB box2) {
+        this(
+                new Interval(box1.xRange, box2.xRange),
+                new Interval(box1.yRange, box2.yRange),
+                new Interval(box1.zRange, box2.zRange)
+        );
+    }
+
+    /**
      * Get the interval of corresponding axis by index
      * @param index the index
      * @return the interval of corresponding axis
@@ -45,9 +56,9 @@ public record AABB(Interval xRange, Interval yRange, Interval zRange) {
     boolean hit(Ray ray, double tMin, double tMax) {
         for (int axis = 0; axis < 3; axis++) {
             Interval ax = axisInterval(axis);
-            double d_inv = 1.0 / ray.direction().component(axis);
-            double t0 = (ax.min() - ray.origin().component(axis)) * d_inv;
-            double t1 = (ax.max() - ray.origin().component(axis)) * d_inv;
+            double dInv = 1.0 / ray.direction().component(axis);
+            double t0 = (ax.min() - ray.origin().component(axis)) * dInv;
+            double t1 = (ax.max() - ray.origin().component(axis)) * dInv;
 
             if (t0 < t1) {
                 if (t0 > tMin) tMin = t0;

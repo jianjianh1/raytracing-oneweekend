@@ -12,6 +12,16 @@ public record Interval(double min, double max) {
     }
 
     /**
+     * Constructs an interval that covers two intervals
+     */
+    public Interval(Interval a, Interval b) {
+        this(
+                Math.min(a.min, b.min),
+                Math.max(a.max, b.max)
+        );
+    }
+
+    /**
      * The size (length) of interval
      * @return the size
      */
