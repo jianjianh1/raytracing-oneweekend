@@ -18,7 +18,7 @@ public interface Hittable {
      * @param frontFace true if the ray hit at the front face
      * @param material  the material of the surface
      */
-    record HitRecord(Ray ray, double t, Vector3d normal, boolean frontFace, Material material) {
+    record HitRecord(Ray ray, double t, Vector3d normal, boolean frontFace, Material material, double u, double v) {
         /**
          * Records that the ray hit the surface with the given normal at t.
          *
@@ -28,7 +28,7 @@ public interface Hittable {
          * @param material the material of the surface
          */
         public HitRecord(Ray ray, double t, Vector3d normal, Material material) {
-            this(ray, t, normal, frontFace(ray, normal), material);
+            this(ray, t, normal, frontFace(ray, normal), material, 0.0, 0.0);
         }
 
         /**

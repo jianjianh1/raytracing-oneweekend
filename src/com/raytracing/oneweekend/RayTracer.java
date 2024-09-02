@@ -5,6 +5,7 @@ import com.raytracing.base.PixelColor;
 import com.raytracing.base.Vector3d;
 import com.raytracing.interfaces.Hittable;
 import com.raytracing.interfaces.Material;
+import com.raytracing.interfaces.Texture;
 import com.raytracing.objects.*;
 import com.raytracing.utils.ProgressBar;
 import com.raytracing.utils.Canvas;
@@ -88,7 +89,8 @@ public class RayTracer {
         double aperture = 0.1;
         camera = new Camera(lookFrom, lookAt, viewUp, 20, ASPECT_RATIO, aperture, distToFocus);
 
-        Material groundMaterial = new Lambertian(new PixelColor(0.5, 0.5, 0.5));
+        Texture checker = new CheckerTexture(0.32, new PixelColor(0.2, 0.3, 0.1), new PixelColor(0.9, 0.9, 0.9));
+        Material groundMaterial = new Lambertian(checker);
         world.add(new Sphere(new Vector3d(0, -1000, 0), 1000, groundMaterial));
 
         for (int a = -11; a < 11; a++) {

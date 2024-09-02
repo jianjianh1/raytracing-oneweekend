@@ -61,7 +61,8 @@ public class BVHNode implements Hittable {
         if (!boundingBox.hit(ray, tMin, tMax)) return null;
 
         HitRecord hitLeft = left.hit(ray, tMin, tMax);
-        HitRecord hitRight = right.hit(ray, tMin, hitLeft == null ? tMax : hitLeft.t());
+        HitRecord hitRight = right == left ?
+                null : right.hit(ray, tMin, hitLeft == null ? tMax : hitLeft.t());
         return hitRight == null ? hitLeft : hitRight;
     }
 
