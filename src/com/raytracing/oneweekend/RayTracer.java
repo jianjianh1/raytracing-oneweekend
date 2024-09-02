@@ -30,10 +30,11 @@ public class RayTracer {
     private static final Random rng = new Random(42);
 
     public static void main(String[] args) throws IOException {
-        switch (3) {
+        switch (4) {
             case 1 -> boundingSpheres();
             case 2 -> checkeredSpheres();
             case 3 -> earth();
+            case 4 -> perlinSpheres();
         }
 
         int imageHeight = (int) (imageWidth / aspectRatio);
@@ -84,6 +85,24 @@ public class RayTracer {
 
         // blend white (1.0F, 1.0F, 1.0F) and sky blue (0.5F, 0.7F, 1.0F)
         return PixelColor.WHITE.scale(1 - s).add(PixelColor.SKY_BLUE.scale(s));
+    }
+
+    private static void perlinSpheres() {
+        NoiseTexture perlin = new NoiseTexture();
+        world.add(new Sphere(new Vector3d(0, -1000, 0), 1000, new Lambertian(perlin)));
+        world.add(new Sphere(new Vector3d(0, 2, 0), 2, new Lambertian(perlin)));
+
+        aspectRatio = 16.0 / 9.0;
+        imageWidth = 400;
+        samplesPerPixel = 100;
+        maxDepth = 50;
+
+        double vFov = 20;
+        var lookFrom = new Vector3d(13, 2, 3);
+        var lookAt = new Vector3d();
+        var viewUp = new Vector3d(0, 1, 0);
+
+        camera = new Camera(lookFrom, lookAt, viewUp, vFov, aspectRatio);
     }
 
     private static void earth() throws IOException {
