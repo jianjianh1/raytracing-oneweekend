@@ -40,7 +40,7 @@ public class RayTracer {
     private static HittableList world = new HittableList();
 
     public static void main(String[] args) throws IOException {
-        switch (7) {
+        switch (8) {
             case 1 -> boundingSpheres();
             case 2 -> checkeredSpheres();
             case 3 -> earth();
@@ -48,6 +48,7 @@ public class RayTracer {
             case 5 -> quads();
             case 6 -> sampleLight();
             case 7 -> cornellBox();
+            case 8 -> cornellSmoke();
         }
 
         int imageHeight = (int) (imageWidth / aspectRatio);
@@ -95,6 +96,43 @@ public class RayTracer {
         PixelColor colorFromScatter = rayColor(scatter.scatteredRay(), depth - 1).dot(scatter.attenuation());
 
         return colorFromEmission.add(colorFromScatter);
+    }
+
+    private static void cornellSmoke() {
+        var red = new Lambertian(new PixelColor(0.65, 0.05, 0.05));
+        var white = new Lambertian(new PixelColor(0.73, 0.73, 0.73));
+        var green = new Lambertian(new PixelColor(0.12, 0.45, 0.15));
+        var light = new DiffuseLight(new PixelColor(7, 7, 7));
+
+        world.add(new Quad(new Vector3d(555, 0, 0), new Vector3d(0, 555, 0), new Vector3d(0, 0, 555), green));
+        world.add(new Quad(new Vector3d(0, 0, 0), new Vector3d(0, 555, 0), new Vector3d(0, 0, 555), red));
+        world.add(new Quad(new Vector3d(113, 554, 127), new Vector3d(330, 0, 0), new Vector3d(0, 0, 305), light));
+        world.add(new Quad(new Vector3d(0, 0, 0), new Vector3d(555, 0, 0), new Vector3d(0, 0, 555), white));
+        world.add(new Quad(new Vector3d(555, 555, 555), new Vector3d(-555, 0, 0), new Vector3d(0, 0, -555), white));
+        world.add(new Quad(new Vector3d(0,0, 555), new Vector3d(555, 0, 0), new Vector3d(0, 555, 0), white));
+
+        Hittable box1 = new Box(new Vector3d(), new Vector3d(165, 330, 165), white);
+        box1 = new RotateY(box1, 15);
+        box1 = new Translate(box1, new Vector3d(265, 0, 295));
+        world.add(new ConstantMedium(box1, 0.01, PixelColor.BLACK));
+
+        Hittable box2 = new Box(new Vector3d(), new Vector3d(165, 165, 165), white);
+        box2 = new RotateY(box2, -18);
+        box2 = new Translate(box2, new Vector3d(130, 0, 65));
+        world.add(new ConstantMedium(box2, 0.01, PixelColor.WHITE));
+
+        aspectRatio = 1.0;
+        imageWidth = 600;
+        samplesPerPixel = 200;
+        maxDepth = 50;
+        background = PixelColor.BLACK;
+
+        double vFov = 40;
+        var lookFrom = new Vector3d(278, 278, -800);
+        var lookAt = new Vector3d(278, 278, 0);
+        var viewUp = new Vector3d(0, 1, 0);
+
+        camera = new Camera(lookFrom, lookAt, viewUp, vFov, aspectRatio);
     }
 
     private static void cornellBox() {
