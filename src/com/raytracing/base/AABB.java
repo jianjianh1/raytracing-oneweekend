@@ -115,4 +115,37 @@ public class AABB {
                 zRange.translate(offset.z())
         );
     }
+
+    /**
+     * @return The AABB after rotation about y-axis
+     */
+    public AABB rotateY(double angleInDegree) {
+        double sinTheta = Math.sin(Math.toRadians(angleInDegree));
+        double cosTheta = Math.cos(Math.toRadians(angleInDegree));
+
+        double minX, minZ;
+        minX = minZ = Double.NEGATIVE_INFINITY;
+        double maxX, maxZ;
+        maxX = maxZ = Double.POSITIVE_INFINITY;
+        // loop through every vertex to find min and max after rotation
+        for (int i = 0; i < 2; i++) {
+            for (int j = 0; j < 2; j++) {
+                double x = i * xRange.max() + (1 - i) * xRange.min();
+                double z = j * zRange.max() + (1 - j) * zRange.min();
+
+                double newX = cosTheta * x + sinTheta * z;
+                double newZ = -sinTheta * x + cosTheta * z;
+
+                minX = Math.min(minX, newX);
+                minZ = Math.min(minZ, newZ);
+                maxX = Math.max(maxX, newX);
+                maxZ = Math.max(maxZ, newZ);
+            }
+        }
+
+        Vector3d min = new Vector3d(minX, yRange.min(), minZ);
+        Vector3d max = new Vector3d(maxX, yRange.max(), maxZ);
+
+        return new AABB(min, max);
+    }
 }

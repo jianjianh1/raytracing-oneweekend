@@ -15,6 +15,8 @@ import com.raytracing.structures.BVHNode;
 import com.raytracing.textures.CheckerTexture;
 import com.raytracing.textures.ImageTexture;
 import com.raytracing.textures.NoiseTexture;
+import com.raytracing.transform.RotateY;
+import com.raytracing.transform.Translate;
 import com.raytracing.utils.ProgressBar;
 import com.raytracing.utils.Canvas;
 
@@ -108,8 +110,15 @@ public class RayTracer {
         world.add(new Quad(new Vector3d(555, 555, 555), new Vector3d(-555, 0, 0), new Vector3d(0, 0, -555), white));
         world.add(new Quad(new Vector3d(0,0, 555), new Vector3d(555, 0, 0), new Vector3d(0, 555, 0), white));
 
-        world.add(new Box(new Vector3d(130, 0, 65), new Vector3d(295, 165, 230), white));
-        world.add(new Box(new Vector3d(265, 0, 295), new Vector3d(430, 330, 460), white));
+        Hittable box1 = new Box(new Vector3d(), new Vector3d(165, 330, 165), white);
+        box1 = new RotateY(box1, 15);
+        box1 = new Translate(box1, new Vector3d(265, 0, 295));
+        world.add(box1);
+
+        Hittable box2 = new Box(new Vector3d(), new Vector3d(165, 165, 165), white);
+        box2 = new RotateY(box2, -18);
+        box2 = new Translate(box2, new Vector3d(130, 0, 65));
+        world.add(box2);
 
         aspectRatio = 1.0;
         imageWidth = 600;

@@ -28,25 +28,22 @@ public interface Hittable {
          * @param material the material of the surface
          */
         public HitRecord(Ray ray, double t, Vector3d normal, Material material) {
-            this(ray, t, normal, frontFace(ray, normal), material, 0.0, 0.0);
+            this(
+                    ray, t,
+                    frontFace(ray, normal) ? normal : normal.opposite(), frontFace(ray, normal),
+                    material, 0.0, 0.0
+            );
         }
 
         /**
          * Construct a hit record with (u, v) coordinate information
          */
         public HitRecord(Ray ray, double t, Vector3d normal, Material material, double u, double v) {
-            this(ray, t, normal, frontFace(ray, normal), material, u, v);
-        }
-
-        /**
-         * Returns the surface normal where the ray hit, that is the outward normal
-         * if the ray hit outward else inward normal.
-         *
-         * @return the surface normal where the ray hit
-         */
-        @Override
-        public Vector3d normal() {
-            return frontFace ? normal : normal.opposite();
+            this(
+                    ray, t,
+                    frontFace(ray, normal) ? normal : normal.opposite(), frontFace(ray, normal),
+                    material, u, v
+            );
         }
 
         /**
