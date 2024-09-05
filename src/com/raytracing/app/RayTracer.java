@@ -40,7 +40,7 @@ public class RayTracer {
     private static HittableList world = new HittableList();
 
     public static void main(String[] args) throws IOException {
-        switch (8) {
+        switch (9) {
             case 1 -> boundingSpheres();
             case 2 -> checkeredSpheres();
             case 3 -> earth();
@@ -49,6 +49,8 @@ public class RayTracer {
             case 6 -> sampleLight();
             case 7 -> cornellBox();
             case 8 -> cornellSmoke();
+            case 9 -> finalScene(800, 5_000, 20);
+            default -> finalScene(400, 250, 4);
         }
 
         int imageHeight = (int) (imageWidth / aspectRatio);
@@ -96,6 +98,91 @@ public class RayTracer {
         PixelColor colorFromScatter = rayColor(scatter.scatteredRay(), depth - 1).dot(scatter.attenuation());
 
         return colorFromEmission.add(colorFromScatter);
+    }
+
+    private static void finalScene(int width, int samples, int depth) throws IOException {
+        // ground green boxes
+        HittableList boxes1 = new HittableList();
+        var ground = new Lambertian(new PixelColor(0.48, 0.83, 0.53));
+        int boxesPerSide = 20;
+        for (int i = 0; i < boxesPerSide; i++) {
+            for (int j = 0; j < boxesPerSide; j++) {
+                var w = 100.0;
+                var x0 = -1000.0 + i * w;
+                var z0 = -1000.0 + j * w;
+                var y0 = 0.0;
+                var x1 = x0 + w;
+                var y1 = rng.nextDouble(1, 101);
+                var z1 = z0 + w;
+
+                boxes1.add(new Box(new Vector3d(x0, y0, z0), new Vector3d(x1, y1, z1), ground));
+            }
+        }
+        world.add(new BVHNode(boxes1));
+
+        // light
+        var light = new DiffuseLight(new PixelColor(7, 7, 7));
+        world.add(new Quad(new Vector3d(123, 554, 147), new Vector3d(300, 0, 0), new Vector3d(0, 0, 265), light));
+
+        // brown moving sphere
+        var center1 = new Vector3d(400, 400, 200);
+        var center2 = center1.add(new Vector3d(30, 0, 0));
+        world.add(new Sphere(center1, center2, 50, new Lambertian(new PixelColor(0.7, 0.3, 0.1))));
+
+        // glass ball
+        world.add(new Sphere(new Vector3d(260, 150, 45), 50, new Dielectric(1.5)));
+
+        // diffuse metal ball
+        world.add(new Sphere(new Vector3d(0, 150, 145), 50, new Metal(new PixelColor(0.8, 0.8, 0.9), 1.0)));
+
+        // glass ball with blue volume content
+        var boundary = new Sphere(new Vector3d(360, 150, 145), 70, new Dielectric(1.5));
+        world.add(boundary);
+        world.add(new ConstantMedium(boundary, 0.2, new PixelColor(0.2, 0.4, 0.9)));
+
+        // the whole scene is contained in fog
+        boundary = new Sphere(new Vector3d(), 5000, new Dielectric(1.5));
+        world.add(new ConstantMedium(boundary, 1e-4, PixelColor.WHITE));
+
+        // earth
+        String texturePath = Paths.get(System.getProperty("user.dir"), "assets", "earthmap.jpg").toString();
+        ImageTexture earthTexture = new ImageTexture(texturePath);
+        world.add(new Sphere(new Vector3d(400, 200, 400), 100, new Lambertian(earthTexture)));
+
+        // perlin ball
+        var perlinTexture = new NoiseTexture(0.2); // low frequency
+        world.add(new Sphere(new Vector3d(220, 280, 300), 80, new Lambertian(perlinTexture)));
+
+        // cluster of white balls
+        HittableList boxes2 = new HittableList();
+        var white = new Lambertian(new PixelColor(0.73, 0.73, 0.73));
+        int ns = 1000; // number of balls
+        for (int j = 0; j < ns; j++) {
+            boxes2.add(
+                    new Sphere(
+                            new Vector3d(rng.nextDouble(165), rng.nextDouble(165), rng.nextDouble(165)),
+                            10,
+                            white
+                    )
+            );
+        }
+        world.add(new Translate(
+                new RotateY(new BVHNode(boxes2), 15),
+                new Vector3d(-100, 270, 395)
+        ));
+
+        aspectRatio = 1.0;
+        imageWidth = width;
+        samplesPerPixel = samples;
+        maxDepth = depth;
+        background = PixelColor.BLACK;
+
+        double vFov = 40;
+        var lookFrom = new Vector3d(478, 278, -600);
+        var lookAt = new Vector3d(278, 278, 0);
+        var viewUp = new Vector3d(0, 1, 0);
+
+        camera = new Camera(lookFrom, lookAt, viewUp, vFov, aspectRatio);
     }
 
     private static void cornellSmoke() {
