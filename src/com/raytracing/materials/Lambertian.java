@@ -24,7 +24,11 @@ public record Lambertian(Texture texture) implements Material {
      */
     @Override
     public ScatterRecord scatter(Hittable.HitRecord hitRecord) {
-        var scatterDirection = hitRecord.normal().add(Vector3d.randomUnit());
+//        var scatterDirection = hitRecord.normal().add(Vector3d.randomUnit());
+        var scatterDirection = Vector3d.randomUnit();
+        if (scatterDirection.dot(hitRecord.normal()) < 0.0) {
+            scatterDirection = scatterDirection.opposite();
+        }
         var scatteredRay = new Ray(hitRecord.point(), scatterDirection, hitRecord.ray().time());
         var attenuation = texture.value(hitRecord.u(), hitRecord.v(), hitRecord.point());
         return new ScatterRecord(attenuation, scatteredRay);
@@ -35,7 +39,8 @@ public record Lambertian(Texture texture) implements Material {
      */
     @Override
     public double scatteringPdf(Ray rayIn, Hittable.HitRecord hitRecord, Ray rayOut) {
-        double cosTheta = hitRecord.normal().dot(rayOut.direction().normalized());
-        return Math.max(0, cosTheta / Math.PI);
+//        double cosTheta = hitRecord.normal().dot(rayOut.direction().normalized());
+//        return Math.max(0, cosTheta / Math.PI);
+        return 1.0 / (2.0 * Math.PI);
     }
 }
