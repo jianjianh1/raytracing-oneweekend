@@ -33,7 +33,7 @@ public interface Material {
     /**
      * Default emit no light
      */
-    default PixelColor emitted(double u, double v, Vector3d p) {
+    default PixelColor emitted(Hittable.HitRecord hitRecord, double u, double v, Vector3d p) {
         return PixelColor.BLACK;
     }
 

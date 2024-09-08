@@ -97,15 +97,33 @@ public class RayTracer {
         Hittable.HitRecord hit = world.hit(ray, new Interval(EPSILON, Double.POSITIVE_INFINITY));
         if (hit == null) return background;
 
-        PixelColor colorFromEmission = hit.material().emitted(hit.u(), hit.v(), hit.point());
+        PixelColor colorFromEmission = hit.material().emitted(hit, hit.u(), hit.v(), hit.point());
 
         Material.ScatterRecord scatter = hit.material().scatter(hit);
         if (scatter == null) {
             return colorFromEmission;
         }
-        double scatteringPdf = hit.material().scatteringPdf(hit, scatter.scatteredRay());
-        double pdfValue = scatteringPdf;
-        PixelColor colorFromScatter = rayColor(scatter.scatteredRay(), depth - 1).dot(scatter.attenuation()).scale(scatteringPdf / pdfValue);
+
+        var onLight = new Vector3d(rng.nextDouble(213, 343), 554, rng.nextDouble(227, 332));
+        var toLight = onLight.subtract(hit.point());
+        double distanceSquared = toLight.lengthSquared();
+
+        toLight = toLight.normalized();
+        if (toLight.dot(hit.normal()) < 0.0) { // light is on the back
+            return colorFromEmission;
+        }
+
+        double lightArea = (343 - 213) * (332 - 227);
+        double lightCosine = Math.abs(toLight.y());
+        if (lightCosine < 1e-6) { // light ray close to the surface
+            return colorFromEmission;
+        }
+        double pdfValue = distanceSquared / (lightCosine * lightArea);
+
+        var scatteredRay = new Ray(hit.point(), toLight, ray.time());
+        double scatteringPdf = hit.material().scatteringPdf(hit, scatteredRay);
+
+        PixelColor colorFromScatter = rayColor(scatteredRay, depth - 1).dot(scatter.attenuation()).scale(scatteringPdf / pdfValue);
 
         return colorFromEmission.add(colorFromScatter);
     }
@@ -257,7 +275,7 @@ public class RayTracer {
 
         aspectRatio = 1.0;
         imageWidth = 600;
-        samplesPerPixel = 1000;
+        samplesPerPixel = 10;
         maxDepth = 50;
         background = PixelColor.BLACK;
 
