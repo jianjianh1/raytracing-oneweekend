@@ -40,7 +40,7 @@ public class RayTracer {
     private static HittableList world = new HittableList();
 
     public static void main(String[] args) throws IOException {
-        switch (9) {
+        switch (7) {
             case 1 -> boundingSpheres();
             case 2 -> checkeredSpheres();
             case 3 -> earth();
@@ -53,6 +53,10 @@ public class RayTracer {
             default -> finalScene(400, 250, 4);
         }
 
+        // square root of samples per pixel
+        int sqrtSpp = (int) (Math.sqrt(samplesPerPixel));
+        double sqrtSppReciprocal = 1.0 / sqrtSpp;
+
         int imageHeight = (int) (imageWidth / aspectRatio);
         ProgressBar progressBar = new ProgressBar(imageWidth * imageHeight);
 
@@ -60,12 +64,16 @@ public class RayTracer {
             for (int x = 0; x < imageWidth; x++) {
                 for (int y = 0; y < imageHeight; y++) {
                     PixelColor pixel = new PixelColor();
-                    for (int i = 0; i < samplesPerPixel; i++) {
-                        double u = (x + Math.random()) / (imageWidth - 1);
-                        double v = (y + Math.random()) / (imageHeight - 1);
-                        // ray start from origin and hit at u portion of width and v portion of height
-                        Ray ray = camera.getRay(u, v);
-                        pixel.addSample(rayColor(ray, maxDepth));
+                    for (int si = 0; si < sqrtSpp; si++) {
+                        for (int sj = 0; sj < sqrtSpp; sj++) {
+                            double px = (si + rng.nextDouble()) * sqrtSppReciprocal - 0.5;
+                            double py = (sj + rng.nextDouble()) * sqrtSppReciprocal - 0.5;
+                            double u = (x + px) / (imageWidth - 1);
+                            double v = (y + py) / (imageHeight - 1);
+                            // ray start from origin and hit at u portion of width and v portion of height
+                            Ray ray = camera.getRay(u, v);
+                            pixel.addSample(rayColor(ray, maxDepth));
+                        }
                     }
                     canvas.fillPixel(x, y, pixel.color());
 
@@ -95,7 +103,9 @@ public class RayTracer {
         if (scatter == null) {
             return colorFromEmission;
         }
-        PixelColor colorFromScatter = rayColor(scatter.scatteredRay(), depth - 1).dot(scatter.attenuation());
+        double scatteringPdf = hit.material().scatteringPdf(ray, hit, scatter.scatteredRay());
+        double pdfValue = scatteringPdf;
+        PixelColor colorFromScatter = rayColor(scatter.scatteredRay(), depth - 1).dot(scatter.attenuation()).scale(scatteringPdf / pdfValue);
 
         return colorFromEmission.add(colorFromScatter);
     }
@@ -247,7 +257,7 @@ public class RayTracer {
 
         aspectRatio = 1.0;
         imageWidth = 600;
-        samplesPerPixel = 200;
+        samplesPerPixel = 1000;
         maxDepth = 50;
         background = PixelColor.BLACK;
 

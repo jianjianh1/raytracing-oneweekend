@@ -32,4 +32,11 @@ public interface Material {
     default PixelColor emitted(double u, double v, Vector3d p) {
         return PixelColor.BLACK;
     }
+
+    /**
+     * The scattering probability density function
+     */
+    default double scatteringPdf(Ray rayIn, Hittable.HitRecord hitRecord, Ray rayOut) {
+        return 0.0;
+    };
 }

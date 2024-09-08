@@ -29,4 +29,13 @@ public record Lambertian(Texture texture) implements Material {
         var attenuation = texture.value(hitRecord.u(), hitRecord.v(), hitRecord.point());
         return new ScatterRecord(attenuation, scatteredRay);
     }
+
+    /**
+     * The scattering probability density function, proportional to cosine theta
+     */
+    @Override
+    public double scatteringPdf(Ray rayIn, Hittable.HitRecord hitRecord, Ray rayOut) {
+        double cosTheta = hitRecord.normal().dot(rayOut.direction().normalized());
+        return Math.max(0, cosTheta / Math.PI);
+    }
 }
