@@ -26,7 +26,7 @@ public record Metal(PixelColor albedo, double fuzziness) implements Material {
     @Override
     public ScatterRecord scatter(Hittable.HitRecord hitRecord) {
         var reflectedDirection = hitRecord.ray().unitDirection().reflectOn(hitRecord.normal());
-        var scatteredRay = new Ray(hitRecord.point(), reflectedDirection.add(Vector3d.randomUnit().scale(fuzziness)), hitRecord.ray().time());
+        var scatteredRay = new Ray(hitRecord.point(), reflectedDirection.add(Vector3d.randomUnitUniform().scale(fuzziness)), hitRecord.ray().time());
         return new ScatterRecord(albedo, scatteredRay);
     }
 }

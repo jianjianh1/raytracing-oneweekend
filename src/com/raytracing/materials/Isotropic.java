@@ -21,8 +21,16 @@ public record Isotropic(Texture texture) implements Material {
      * Randomly scatter a ray attenuated
      */
     public ScatterRecord scatter(Hittable.HitRecord hitRecord) {
-        var scattered = new Ray(hitRecord.point(), Vector3d.randomUnit(), hitRecord.ray().time());
+        var scattered = new Ray(hitRecord.point(), Vector3d.randomUnitUniform(), hitRecord.ray().time());
         var attenuation = texture.value(hitRecord.u(), hitRecord.v(), hitRecord.point());
-        return new ScatterRecord(attenuation, scattered);
+        return new ScatterRecord(attenuation, scattered, 1.0 / (4.0 * Math.PI));
+    }
+
+    /**
+     * Uniform over the sphere surface
+     */
+    @Override
+    public double scatteringPdf(Hittable.HitRecord hitRecord, Ray rayOut) {
+        return 1.0 / (4.0 * Math.PI);
     }
 }

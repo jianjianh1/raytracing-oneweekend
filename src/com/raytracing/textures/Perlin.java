@@ -16,7 +16,7 @@ public class Perlin {
      * Constructs necessary arrays for generating perlin noise
      */
     public Perlin() {
-        for (int i = 0; i < randVec.length; i++) randVec[i] = Vector3d.randomUnit();
+        for (int i = 0; i < randVec.length; i++) randVec[i] = Vector3d.randomUnitUniform();
 
         perlinGeneratePerm(permX);
         perlinGeneratePerm(permY);

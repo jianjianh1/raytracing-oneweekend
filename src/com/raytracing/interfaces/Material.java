@@ -14,7 +14,11 @@ public interface Material {
      * @param attenuation  the attenuated color
      * @param scatteredRay the scattered ray
      */
-    record ScatterRecord(PixelColor attenuation, Ray scatteredRay) {}
+    record ScatterRecord(PixelColor attenuation, Ray scatteredRay, double pdf) {
+        public ScatterRecord(PixelColor attenuation, Ray scatteredRay) {
+            this(attenuation, scatteredRay, 0.0);
+        }
+    }
 
     /**
      * Returns a record of scattering of a hit. Default returns null
@@ -36,7 +40,7 @@ public interface Material {
     /**
      * The scattering probability density function
      */
-    default double scatteringPdf(Ray rayIn, Hittable.HitRecord hitRecord, Ray rayOut) {
+    default double scatteringPdf(Hittable.HitRecord hitRecord, Ray rayOut) {
         return 0.0;
     };
 }

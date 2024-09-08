@@ -130,15 +130,27 @@ public record Vector3d(double x, double y, double z) {
     }
 
     /**
-     * Returns a random unit vector.
-     *
-     * @return a random unit vector
+     * @return a random unit vector with uniform distribution
      */
-    public static Vector3d randomUnit() {
+    public static Vector3d randomUnitUniform() {
         double x = rng.nextGaussian();
         double y = rng.nextGaussian();
         double z = rng.nextGaussian();
         return new Vector3d(x, y, z).normalized();
+    }
+
+    /**
+     * @return a random unit Vector with pdf proportional to cosine theta
+     */
+    public static Vector3d randomUnitCosine() {
+        double r1 = rng.nextDouble();
+        double r2 = rng.nextDouble();
+
+        double phi = r1 * 2.0 * Math.PI;
+        double x = Math.cos(phi) * Math.sqrt(r2);
+        double y = Math.sin(phi) * Math.sqrt(r2);
+        double z = Math.sqrt(1 - r2);
+        return new Vector3d(x, y, z);
     }
 
     /**

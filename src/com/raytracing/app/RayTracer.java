@@ -103,8 +103,8 @@ public class RayTracer {
         if (scatter == null) {
             return colorFromEmission;
         }
-        double scatteringPdf = hit.material().scatteringPdf(ray, hit, scatter.scatteredRay());
-        double pdfValue = 1.0 / (2.0 * Math.PI);
+        double scatteringPdf = hit.material().scatteringPdf(hit, scatter.scatteredRay());
+        double pdfValue = scatteringPdf;
         PixelColor colorFromScatter = rayColor(scatter.scatteredRay(), depth - 1).dot(scatter.attenuation()).scale(scatteringPdf / pdfValue);
 
         return colorFromEmission.add(colorFromScatter);

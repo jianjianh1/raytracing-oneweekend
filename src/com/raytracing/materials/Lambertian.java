@@ -1,5 +1,6 @@
 package com.raytracing.materials;
 
+import com.raytracing.base.ONB;
 import com.raytracing.base.PixelColor;
 import com.raytracing.base.Vector3d;
 import com.raytracing.interfaces.Hittable;
@@ -24,23 +25,22 @@ public record Lambertian(Texture texture) implements Material {
      */
     @Override
     public ScatterRecord scatter(Hittable.HitRecord hitRecord) {
-//        var scatterDirection = hitRecord.normal().add(Vector3d.randomUnit());
-        var scatterDirection = Vector3d.randomUnit();
-        if (scatterDirection.dot(hitRecord.normal()) < 0.0) {
-            scatterDirection = scatterDirection.opposite();
-        }
+        var uvw = new ONB(hitRecord.normal());
+        var scatterDirection = uvw.transform(Vector3d.randomUnitCosine()).normalized();
+//        var scatterDirection = hitRecord.normal().add(Vector3d.randomUnitUniform());
+
         var scatteredRay = new Ray(hitRecord.point(), scatterDirection, hitRecord.ray().time());
         var attenuation = texture.value(hitRecord.u(), hitRecord.v(), hitRecord.point());
-        return new ScatterRecord(attenuation, scatteredRay);
+        var pdf = hitRecord.normal().dot(scatterDirection) / Math.PI;
+        return new ScatterRecord(attenuation, scatteredRay, pdf);
     }
 
     /**
      * The scattering probability density function, proportional to cosine theta
      */
     @Override
-    public double scatteringPdf(Ray rayIn, Hittable.HitRecord hitRecord, Ray rayOut) {
-//        double cosTheta = hitRecord.normal().dot(rayOut.direction().normalized());
-//        return Math.max(0, cosTheta / Math.PI);
-        return 1.0 / (2.0 * Math.PI);
+    public double scatteringPdf(Hittable.HitRecord hitRecord, Ray rayOut) {
+        double cosTheta = hitRecord.normal().dot(rayOut.direction().normalized());
+        return Math.max(0, cosTheta / Math.PI);
     }
 }
