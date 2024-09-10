@@ -10,6 +10,7 @@ import com.raytracing.materials.Dielectric;
 import com.raytracing.materials.DiffuseLight;
 import com.raytracing.materials.Lambertian;
 import com.raytracing.materials.Metal;
+import com.raytracing.pdf.CosinePdf;
 import com.raytracing.scene.*;
 import com.raytracing.structures.BVHNode;
 import com.raytracing.textures.CheckerTexture;
@@ -104,25 +105,29 @@ public class RayTracer {
             return colorFromEmission;
         }
 
-        var onLight = new Vector3d(rng.nextDouble(213, 343), 554, rng.nextDouble(227, 332));
-        var toLight = onLight.subtract(hit.point());
-        double distanceSquared = toLight.lengthSquared();
+//        var onLight = new Vector3d(rng.nextDouble(213, 343), 554, rng.nextDouble(227, 332));
+//        var toLight = onLight.subtract(hit.point());
+//        double distanceSquared = toLight.lengthSquared();
+//
+//        toLight = toLight.normalized();
+//        if (toLight.dot(hit.normal()) < 0.0) { // light is on the back
+//            return colorFromEmission;
+//        }
+//
+//        double lightArea = (343 - 213) * (332 - 227);
+//        double lightCosine = Math.abs(toLight.y());
+//        if (lightCosine < 1e-6) { // light ray close to the surface
+//            return colorFromEmission;
+//        }
+//        double pdfValue = distanceSquared / (lightCosine * lightArea);
 
-        toLight = toLight.normalized();
-        if (toLight.dot(hit.normal()) < 0.0) { // light is on the back
-            return colorFromEmission;
-        }
+//        var scatteredRay = new Ray(hit.point(), toLight, ray.time());
+//        double scatteringPdf = hit.material().scatteringPdf(hit, scatteredRay);
 
-        double lightArea = (343 - 213) * (332 - 227);
-        double lightCosine = Math.abs(toLight.y());
-        if (lightCosine < 1e-6) { // light ray close to the surface
-            return colorFromEmission;
-        }
-        double pdfValue = distanceSquared / (lightCosine * lightArea);
-
-        var scatteredRay = new Ray(hit.point(), toLight, ray.time());
+        CosinePdf surfacePdf = new CosinePdf(hit.normal());
+        var scatteredRay = new Ray(hit.point(), surfacePdf.generate(), ray.time());
+        double pdfValue = surfacePdf.value(scatteredRay.direction());
         double scatteringPdf = hit.material().scatteringPdf(hit, scatteredRay);
-
         PixelColor colorFromScatter = rayColor(scatteredRay, depth - 1).dot(scatter.attenuation()).scale(scatteringPdf / pdfValue);
 
         return colorFromEmission.add(colorFromScatter);
@@ -275,7 +280,7 @@ public class RayTracer {
 
         aspectRatio = 1.0;
         imageWidth = 600;
-        samplesPerPixel = 10;
+        samplesPerPixel = 100;
         maxDepth = 50;
         background = PixelColor.BLACK;
 
