@@ -11,6 +11,7 @@ import com.raytracing.materials.DiffuseLight;
 import com.raytracing.materials.Lambertian;
 import com.raytracing.materials.Metal;
 import com.raytracing.pdf.CosinePdf;
+import com.raytracing.pdf.HittablePdf;
 import com.raytracing.scene.*;
 import com.raytracing.structures.BVHNode;
 import com.raytracing.textures.CheckerTexture;
@@ -39,6 +40,7 @@ public class RayTracer {
     private static PixelColor background = new PixelColor(0.7, 0.8, 1.0);
     private static Camera camera;
     private static HittableList world = new HittableList();
+    private static Hittable lights = new HittableList();
 
     public static void main(String[] args) throws IOException {
         switch (7) {
@@ -71,7 +73,7 @@ public class RayTracer {
                             double py = (sj + rng.nextDouble()) * sqrtSppReciprocal - 0.5;
                             double u = (x + px) / (imageWidth - 1);
                             double v = (y + py) / (imageHeight - 1);
-                            // ray start from origin and hit at u portion of width and v portion of height
+                            // ray start from Q and hit at u portion of width and v portion of height
                             Ray ray = camera.getRay(u, v);
                             pixel.addSample(rayColor(ray, maxDepth));
                         }
@@ -124,10 +126,16 @@ public class RayTracer {
 //        var scatteredRay = new Ray(hit.point(), toLight, ray.time());
 //        double scatteringPdf = hit.material().scatteringPdf(hit, scatteredRay);
 
-        CosinePdf surfacePdf = new CosinePdf(hit.normal());
-        var scatteredRay = new Ray(hit.point(), surfacePdf.generate(), ray.time());
-        double pdfValue = surfacePdf.value(scatteredRay.direction());
+//        CosinePdf surfacePdf = new CosinePdf(hit.normal());
+//        var scatteredRay = new Ray(hit.point(), surfacePdf.generate(), ray.time());
+//        double pdfValue = surfacePdf.value(scatteredRay.direction());
+
+        HittablePdf lightPdf = new HittablePdf(lights, hit.point());
+        var scatteredRay = new Ray(hit.point(), lightPdf.generate(), ray.time());
+        double pdfValue = lightPdf.value(scatteredRay.direction());
+
         double scatteringPdf = hit.material().scatteringPdf(hit, scatteredRay);
+
         PixelColor colorFromScatter = rayColor(scatteredRay, depth - 1).dot(scatter.attenuation()).scale(scatteringPdf / pdfValue);
 
         return colorFromEmission.add(colorFromScatter);
@@ -278,9 +286,11 @@ public class RayTracer {
         box2 = new Translate(box2, new Vector3d(130, 0, 65));
         world.add(box2);
 
+        lights = new Quad(new Vector3d(343, 554, 332), new Vector3d(-130, 0, 0), new Vector3d(0, 0, -105), null);
+
         aspectRatio = 1.0;
         imageWidth = 600;
-        samplesPerPixel = 100;
+        samplesPerPixel = 10;
         maxDepth = 50;
         background = PixelColor.BLACK;
 

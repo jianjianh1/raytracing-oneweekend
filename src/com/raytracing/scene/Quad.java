@@ -6,13 +6,16 @@ import com.raytracing.interfaces.Hittable;
 import com.raytracing.interfaces.Material;
 import com.raytracing.base.AABB;
 
+import java.util.Random;
+
 /**
  * Parallelogram primitive
  */
-public record Quad(Vector3d origin, Vector3d u, Vector3d v, Vector3d w, Material material, AABB boundingBox, Vector3d normal, double D) implements Hittable {
+public record Quad(Vector3d Q, Vector3d u, Vector3d v, Vector3d w, Material material, AABB boundingBox, Vector3d normal, double D, double area) implements Hittable {
+    private static final Random rng = new Random(42);
 
     /**
-     * Constructs a parallelogram with an origin, two sides vector, and material
+     * Constructs a parallelogram with an Q, two sides vector, and material
      */
     public Quad(Vector3d origin, Vector3d u, Vector3d v, Material material) {
         this(
@@ -26,8 +29,35 @@ public record Quad(Vector3d origin, Vector3d u, Vector3d v, Vector3d w, Material
                         new AABB(origin.add(u), origin.add(v))
                 ),
                 u.cross(v).normalized(),
-                u.cross(v).normalized().dot(origin)
+                u.cross(v).normalized().dot(origin),
+                u.cross(v).length()
             );
+    }
+
+    /**
+     * @param origin the origin of light (from other object)
+     * @param direction the direction of light shooting to this quad
+     * @return the pdf value corresponding to the origin on the direction
+     */
+    @Override
+    public double pdfValue(Vector3d origin, Vector3d direction) {
+        HitRecord hit = hit(new Ray(origin, direction), 1e-3, Double.POSITIVE_INFINITY);
+        if (hit == null) return 0.0;
+
+        double distanceSquared = hit.t() * hit.t() * direction.lengthSquared();
+        double cosine = Math.abs(direction.normalized().dot(hit.normal()));
+
+        return distanceSquared / (cosine * area);
+    }
+
+    /**
+     * @param origin the origin of light (from this quad)
+     * @return a random direction from the origin pointing to this quad
+     */
+    @Override
+    public Vector3d random(Vector3d origin) {
+        var p = Q.add(u.scale(rng.nextDouble())).add(v.scale(rng.nextDouble()));
+        return p.subtract(origin);
     }
 
     /**
@@ -48,7 +78,7 @@ public record Quad(Vector3d origin, Vector3d u, Vector3d v, Vector3d w, Material
         if (!tRange.contains(t)) return null;
 
         Vector3d intersection = ray.at(t); // intersection on the plane
-        Vector3d planeRelative = intersection.subtract(origin);
+        Vector3d planeRelative = intersection.subtract(Q);
         double alpha = w.dot(planeRelative.cross(v));
         double beta = w.dot(u.cross(planeRelative));
         if (!Interval.UNIT.contains(alpha) || !Interval.UNIT.contains(beta)) return null;
