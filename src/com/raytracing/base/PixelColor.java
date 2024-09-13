@@ -56,10 +56,12 @@ public class PixelColor {
      * @param blue  the blue value
      */
     public void addSample(double red, double green, double blue) {
-        redSum += red;
-        greenSum += green;
-        blueSum += blue;
-        numSamples += 1;
+        if (Double.isFinite(red) && Double.isFinite(green) && Double.isFinite(blue)) {
+            redSum += red;
+            greenSum += green;
+            blueSum += blue;
+            numSamples += 1;
+        }
     }
 
     /**

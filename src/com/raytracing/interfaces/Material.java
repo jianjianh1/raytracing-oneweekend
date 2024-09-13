@@ -29,11 +29,7 @@ public interface Material {
         }
 
         public Ray scatteredRay() {
-            if (pdf == null) {
-                return skipPdfRay;
-            } else {
-                return null;
-            }
+            return skipPdfRay;
         }
     }
 

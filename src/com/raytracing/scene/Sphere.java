@@ -1,11 +1,17 @@
 package com.raytracing.scene;
 
+import com.raytracing.base.ONB;
 import com.raytracing.base.Vector3d;
 import com.raytracing.interfaces.Hittable;
 import com.raytracing.interfaces.Material;
 import com.raytracing.base.AABB;
 
+import java.util.Random;
+
 public record Sphere(Vector3d center, double radius, Material material, boolean isMoving, Vector3d velocity, AABB boundingBox) implements Hittable {
+
+    private static final Random rng = new Random(42);
+
     /**
      * Construct a sphere with the given center, radius, and material that's not moving
      * @param center the center
@@ -106,5 +112,56 @@ public record Sphere(Vector3d center, double radius, Material material, boolean 
         double phi = Math.atan2(-p.z(), p.x()) + Math.PI;
 
         return new Vector3d(phi / (2.0 * Math.PI), theta / Math.PI, 0.0);
+    }
+
+    /**
+     * @param origin the origin of ray shooting to this sphere
+     * @param direction the direction of ray
+     * @return the pdf value corresponding to the ray
+     */
+    @Override
+    public double pdfValue(Vector3d origin, Vector3d direction) {
+        // possible only when the ray can hit this sphere
+        HitRecord hit = hit(new Ray(origin, direction), 1e-3, Double.POSITIVE_INFINITY);
+        if (hit == null) return 0.0;
+
+        var distanceVec = center.subtract(origin);
+        var distanceSquared = distanceVec.lengthSquared();
+        var cosThetaMax = Math.sqrt(1 - radius * radius / distanceSquared);
+        var solidAngle = 2 * Math.PI * (1 - cosThetaMax);
+
+        return 1.0 / solidAngle;
+    }
+
+    /**
+     * @param origin the origin of ray shooting to this sphere
+     * @return a random direction shooting to this sphere
+     */
+    @Override
+    public Vector3d random(Vector3d origin) {
+        var distanceVec = center.subtract(origin);
+        var distanceSquared = distanceVec.lengthSquared();
+        var uvw = new ONB(distanceVec);
+        return uvw.transform(randomToSphere(radius, distanceSquared));
+    }
+
+    /**
+     * Generate a random direction shoot to a sphere assuming the axis is z-direction
+     * @param radius the radius of sphere
+     * @param distanceSquared the ray origin to sphere origin distance squared
+     * @return a random direction
+     */
+    private static Vector3d randomToSphere(double radius, double distanceSquared) {
+        double r1 = rng.nextDouble();
+        double r2 = rng.nextDouble();
+        double cosThetaMax = Math.sqrt(1 - radius * radius / distanceSquared);
+
+        double z = 1 + r2 * (cosThetaMax - 1);
+        double phi = Math.PI * r1;
+        double sinTheta = Math.sqrt(1 - z * z);
+        double x = Math.cos(phi) * sinTheta;
+        double y = Math.sin(phi) * sinTheta;
+
+        return new Vector3d(x, y, z);
     }
 }

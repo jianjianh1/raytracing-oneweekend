@@ -94,14 +94,14 @@ public interface Hittable {
     AABB boundingBox();
 
     /**
-     * @return the pdf value corresponding to the Q on the direction
+     * @return the pdf value corresponding to the origin on the direction
      */
     default double pdfValue(Vector3d origin, Vector3d direction) {
         return 0.0;
     }
 
     /**
-     * @return a random direction from the Q
+     * @return a random direction from the origin
      */
     default Vector3d random(Vector3d origin) {
         return Vector3d.randomUnitUniform();

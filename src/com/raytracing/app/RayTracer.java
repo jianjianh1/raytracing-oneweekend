@@ -40,7 +40,7 @@ public class RayTracer {
     private static PixelColor background = new PixelColor(0.7, 0.8, 1.0);
     private static Camera camera;
     private static HittableList world = new HittableList();
-    private static Hittable lights = new HittableList();
+    private static final HittableList lights = new HittableList();
 
     public static void main(String[] args) throws IOException {
         switch (7) {
@@ -109,19 +109,22 @@ public class RayTracer {
 
         PixelColor colorFromScatter;
         if (scatter.pdf() == null) {
-            colorFromScatter = rayColor(scatter.scatteredRay(), depth - 1).dot(scatter.attenuation());
+            return rayColor(scatter.scatteredRay(), depth - 1).dot(scatter.attenuation());
         } else {
             var lightPdf = new HittablePdf(lights, hit.point());
             var mixedPdf = new MixturePdf(scatter.pdf(), lightPdf);
 
             var scatteredRay = new Ray(hit.point(), mixedPdf.generate(), ray.time());
             var pdfValue = mixedPdf.value(scatteredRay.direction());
+            // for debugging
+            if (pdfValue == 0.0) {
+                System.out.println(scatteredRay.direction());
+            }
 
             double scatteringPdf = hit.material().scatteringPdf(hit, scatteredRay);
 
             colorFromScatter = rayColor(scatteredRay, depth - 1).dot(scatter.attenuation()).scale(scatteringPdf / pdfValue);
         }
-
 
         return colorFromEmission.add(colorFromScatter);
     }
@@ -261,18 +264,16 @@ public class RayTracer {
         world.add(new Quad(new Vector3d(555, 555, 555), new Vector3d(-555, 0, 0), new Vector3d(0, 0, -555), white));
         world.add(new Quad(new Vector3d(0,0, 555), new Vector3d(555, 0, 0), new Vector3d(0, 555, 0), white));
 
-        var aluminum = new Metal(new PixelColor(0.8, 0.85, 0.88), 0.0);
-        Hittable box1 = new Box(new Vector3d(), new Vector3d(165, 330, 165), aluminum);
+        Hittable box1 = new Box(new Vector3d(), new Vector3d(165, 330, 165), white);
         box1 = new RotateY(box1, 15);
         box1 = new Translate(box1, new Vector3d(265, 0, 295));
         world.add(box1);
 
-        Hittable box2 = new Box(new Vector3d(), new Vector3d(165, 165, 165), white);
-        box2 = new RotateY(box2, -18);
-        box2 = new Translate(box2, new Vector3d(130, 0, 65));
-        world.add(box2);
+        var glass = new Dielectric(1.5);
+        world.add(new Sphere(new Vector3d(190, 90, 190), 90, glass));
 
-        lights = new Quad(new Vector3d(343, 554, 332), new Vector3d(-130, 0, 0), new Vector3d(0, 0, -105), null);
+        lights.add(new Quad(new Vector3d(343, 554, 332), new Vector3d(-130, 0, 0), new Vector3d(0, 0, -105), null));
+        lights.add(new Sphere(new Vector3d(190, 90, 190), 90, null));
 
         aspectRatio = 1.0;
         imageWidth = 600;
