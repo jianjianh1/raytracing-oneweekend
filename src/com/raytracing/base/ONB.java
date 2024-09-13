@@ -1,7 +1,5 @@
 package com.raytracing.base;
 
-import java.util.Objects;
-
 /**
  * Orthonormal Basis
  */

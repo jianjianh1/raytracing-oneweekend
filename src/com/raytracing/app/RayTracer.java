@@ -107,15 +107,21 @@ public class RayTracer {
             return colorFromEmission;
         }
 
-        var lightPdf = new HittablePdf(lights, hit.point());
-        var mixedPdf = new MixturePdf(scatter.pdf(), lightPdf);
+        PixelColor colorFromScatter;
+        if (scatter.pdf() == null) {
+            colorFromScatter = rayColor(scatter.scatteredRay(), depth - 1).dot(scatter.attenuation());
+        } else {
+            var lightPdf = new HittablePdf(lights, hit.point());
+            var mixedPdf = new MixturePdf(scatter.pdf(), lightPdf);
 
-        var scatteredRay = new Ray(hit.point(), mixedPdf.generate(), ray.time());
-        var pdfValue = mixedPdf.value(scatteredRay.direction());
+            var scatteredRay = new Ray(hit.point(), mixedPdf.generate(), ray.time());
+            var pdfValue = mixedPdf.value(scatteredRay.direction());
 
-        double scatteringPdf = hit.material().scatteringPdf(hit, scatteredRay);
+            double scatteringPdf = hit.material().scatteringPdf(hit, scatteredRay);
 
-        PixelColor colorFromScatter = rayColor(scatteredRay, depth - 1).dot(scatter.attenuation()).scale(scatteringPdf / pdfValue);
+            colorFromScatter = rayColor(scatteredRay, depth - 1).dot(scatter.attenuation()).scale(scatteringPdf / pdfValue);
+        }
+
 
         return colorFromEmission.add(colorFromScatter);
     }
@@ -255,7 +261,8 @@ public class RayTracer {
         world.add(new Quad(new Vector3d(555, 555, 555), new Vector3d(-555, 0, 0), new Vector3d(0, 0, -555), white));
         world.add(new Quad(new Vector3d(0,0, 555), new Vector3d(555, 0, 0), new Vector3d(0, 555, 0), white));
 
-        Hittable box1 = new Box(new Vector3d(), new Vector3d(165, 330, 165), white);
+        var aluminum = new Metal(new PixelColor(0.8, 0.85, 0.88), 0.0);
+        Hittable box1 = new Box(new Vector3d(), new Vector3d(165, 330, 165), aluminum);
         box1 = new RotateY(box1, 15);
         box1 = new Translate(box1, new Vector3d(265, 0, 295));
         world.add(box1);
@@ -269,7 +276,7 @@ public class RayTracer {
 
         aspectRatio = 1.0;
         imageWidth = 600;
-        samplesPerPixel = 100;
+        samplesPerPixel = 1000;
         maxDepth = 50;
         background = PixelColor.BLACK;
 
